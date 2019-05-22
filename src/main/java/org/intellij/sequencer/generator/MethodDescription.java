@@ -9,13 +9,13 @@ public class MethodDescription {
     private ClassDescription _classDescription;
 
     private String _methodName;
-    private List _attributes;
+    private List<String> _attributes;
     private List _argNames;
     private List _argTypes;
     private String _returnType;
     private int _hashCode = -1;
 
-    private MethodDescription(ClassDescription classDescription, List attributes,
+    private MethodDescription(ClassDescription classDescription, List<String> attributes,
                               String methodName, String returnType, List argNames, List argTypes) {
         _attributes = attributes;
         _returnType = returnType;
@@ -26,9 +26,9 @@ public class MethodDescription {
     }
 
     public String toString() {
-        StringBuffer buffer = new StringBuffer();
-        for (Iterator iterator = _attributes.iterator(); iterator.hasNext(); ) {
-            String attribute = (String) iterator.next();
+        StringBuilder buffer = new StringBuilder();
+        for (Object o : _attributes) {
+            String attribute = (String) o;
             buffer.append('|').append(attribute);
         }
         buffer.append("|@").append(_methodName).append('[');
@@ -42,7 +42,7 @@ public class MethodDescription {
         return buffer.toString();
     }
 
-    public String toJson() {
+    String toJson() {
         return new GsonBuilder().create().toJson(this);
     }
 
@@ -96,8 +96,8 @@ public class MethodDescription {
         if (_hashCode == -1) {
             _hashCode = _classDescription.hashCode();
             _hashCode = 29 * _hashCode + _methodName.hashCode();
-            for (Iterator iterator = _argTypes.iterator(); iterator.hasNext(); ) {
-                String argType = (String) iterator.next();
+            for (Object type : _argTypes) {
+                String argType = (String) type;
                 _hashCode = 29 * _hashCode + argType.hashCode();
             }
         }
@@ -105,14 +105,14 @@ public class MethodDescription {
     }
 
     static MethodDescription createMethodDescription(ClassDescription classDescription,
-                                                     List attributes, String methodName,
+                                                     List<String> attributes, String methodName,
                                                      String returnType,
                                                      List argNames, List argTypes) {
         return new MethodDescription(classDescription, attributes, methodName, returnType, argNames, argTypes);
     }
 
     static MethodDescription createConstructorDescription(ClassDescription classDescription,
-                                                          List attributes, List argNames,
+                                                          List<String> attributes, List argNames,
                                                           List argTypes) {
         return new MethodDescription(classDescription, attributes, Constants.CONSTRUCTOR_METHOD_NAME,
                 classDescription.getClassName(), argNames, argTypes);
@@ -121,6 +121,6 @@ public class MethodDescription {
     static MethodDescription createLambdaDescription(ClassDescription classDescription,
                                                      List argNames, List argTypes, String returnType) {
         return new MethodDescription(classDescription,
-                new ArrayList(), Constants.Lambda_Invoke, returnType, argNames, argTypes);
+                new ArrayList<>(), Constants.Lambda_Invoke, returnType, argNames, argTypes);
     }
 }
