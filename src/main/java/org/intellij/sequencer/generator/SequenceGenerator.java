@@ -61,7 +61,7 @@ public class SequenceGenerator extends JavaElementVisitor {
 
     private boolean alreadyInStack(PsiMethod psiMethod) {
         MethodDescription method = createMethod(psiMethod);
-        return currentStack.isReqursive(method);
+        return currentStack.isRecursive(method);
     }
 
     private void methodAccept(PsiElement psiElement) {
@@ -86,7 +86,7 @@ public class SequenceGenerator extends JavaElementVisitor {
             topStack = new CallStack(method);
             currentStack = topStack;
         } else {
-            if (!params.isAllowRecursion() && currentStack.isReqursive(method))
+            if (!params.isAllowRecursion() && currentStack.isRecursive(method))
                 return;
             currentStack = currentStack.methodCall(method);
         }
@@ -255,7 +255,7 @@ public class SequenceGenerator extends JavaElementVisitor {
             topStack = new CallStack(method);
             currentStack = topStack;
         } else {
-            if (!params.isAllowRecursion() && currentStack.isReqursive(method))
+            if (!params.isAllowRecursion() && currentStack.isRecursive(method))
                 return;
             currentStack = currentStack.methodCall(method);
         }
