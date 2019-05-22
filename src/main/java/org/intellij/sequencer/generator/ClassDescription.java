@@ -1,23 +1,20 @@
 package org.intellij.sequencer.generator;
 
-import com.google.gson.GsonBuilder;
 import org.intellij.sequencer.Constants;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 public class ClassDescription {
     private String _className;
     private List _attributes;
 
-    public ClassDescription(String className, List attributes) {
+    ClassDescription(String className, List attributes) {
         _className = className != null ? className : Constants.ANONYMOUS_CLASS_NAME;
         _attributes = attributes;
     }
 
-    public String getClassShortName() {
+    String getClassShortName() {
         return _className.substring(_className.lastIndexOf('.') + 1);
     }
 
@@ -28,9 +25,9 @@ public class ClassDescription {
     public List getAttributes() { return Collections.unmodifiableList(_attributes); }
 
     public String toString() {
-        StringBuffer buffer = new StringBuffer();
-        for(Iterator iterator = _attributes.iterator(); iterator.hasNext();) {
-            String attribute = (String)iterator.next();
+        StringBuilder buffer = new StringBuilder();
+        for (Object o : _attributes) {
+            String attribute = (String) o;
             buffer.append('|').append(attribute);
         }
         buffer.append("|@").append(_className);
@@ -43,14 +40,12 @@ public class ClassDescription {
 
         final ClassDescription classDescription = (ClassDescription)o;
 
-        if(!_className.equals(classDescription._className)) return false;
+        return _className.equals(classDescription._className);
 
-        return true;
     }
 
     public int hashCode() {
         return _className.hashCode();
     }
 
-    public static ClassDescription ANONYMOUS_CLASS = new ClassDescription(Constants.ANONYMOUS_CLASS_NAME,new ArrayList());
 }
