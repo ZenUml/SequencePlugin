@@ -34,32 +34,46 @@ public class SequenceGenerator extends JavaElementVisitor {
             containingClass = (PsiClass) psiMethod.getParent().getContext();
         }
 
+        followImplementation(psiMethod, containingClass);
+        return topStack;
+    }
+
+    private void followImplementation(PsiMethod psiMethod, PsiClass containingClass) {
         // follow implementation
         if (PsiUtil.isAbstract(containingClass)) {
-            psiMethod.accept(this);
-            PsiElement[] psiElements = DefinitionsScopedSearch.search(psiMethod).toArray(PsiElement.EMPTY_ARRAY);
-            if (psiElements.length == 1) {
-                if (psiElements[0] instanceof PsiMethod) {
-                    methodAccept((PsiMethod) psiElements[0]);
-                }
-            } else {
-                for (PsiElement psiElement : psiElements) {
-                    if (psiElement instanceof PsiMethod) {
-                        if (alreadyInStack((PsiMethod) psiElement)) continue;
+            followAbstractClass(psiMethod);
+        } else {
+            resolveVariableInitializer(psiMethod, containingClass);
+        }
+    }
 
-                        if (!params.isSmartInterface() && params.getInterfaceImplFilter().allow((PsiMethod) psiElement)) {
-                            methodAccept((PsiMethod) psiElement);
-                        }
+    private void resolveVariableInitializer(PsiMethod psiMethod, PsiClass containingClass) {
+        // resolve variable initializer
+        if (params.isSmartInterface() && !PsiUtil.isExternal(containingClass)) {
+            containingClass.accept(implementationFinder);
+        }
+        psiMethod.accept(this);
+    }
+
+    private void followAbstractClass(PsiMethod psiMethod) {
+        psiMethod.accept(this);
+        PsiElement[] psiElements = DefinitionsScopedSearch.search(psiMethod).toArray(PsiElement.EMPTY_ARRAY);
+        if (psiElements.length == 1) {
+            if (psiElements[0] instanceof PsiMethod) {
+                methodAccept((PsiMethod) psiElements[0]);
+            }
+        } else {
+            for (PsiElement psiElement : psiElements) {
+                if (psiElement instanceof PsiMethod) {
+                    PsiMethod psiMethod1 = (PsiMethod) psiElement;
+                    if (alreadyInStack(psiMethod1)) continue;
+
+                    if (!params.isSmartInterface() && params.getInterfaceImplFilter().allow(psiMethod1)) {
+                        methodAccept(psiMethod1);
                     }
                 }
             }
-        } else {
-            // resolve variable initializer
-            if (params.isSmartInterface() && !PsiUtil.isExternal(containingClass))
-                containingClass.accept(implementationFinder);
-            psiMethod.accept(this);
         }
-        return topStack;
     }
 
     private boolean alreadyInStack(PsiMethod psiMethod) {
