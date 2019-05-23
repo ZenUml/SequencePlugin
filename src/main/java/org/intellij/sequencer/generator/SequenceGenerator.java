@@ -10,7 +10,6 @@ import org.intellij.sequencer.generator.filters.ImplementClassFilter;
 import org.intellij.sequencer.util.PsiUtil;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class SequenceGenerator extends JavaElementVisitor {
@@ -23,9 +22,11 @@ public class SequenceGenerator extends JavaElementVisitor {
     private CallStack currentStack;
     private int depth;
     private SequenceParams params;
+    private boolean smartInterface;
 
     public SequenceGenerator(SequenceParams params) {
         this.params = params;
+        smartInterface = params.isSmartInterface();
     }
 
     public CallStack generate(PsiMethod psiMethod) {
@@ -49,7 +50,7 @@ public class SequenceGenerator extends JavaElementVisitor {
 
     private void resolveVariableInitializer(PsiMethod psiMethod, PsiClass containingClass) {
         // resolve variable initializer
-        if (params.isSmartInterface() && !PsiUtil.isExternal(containingClass)) {
+        if (smartInterface && !PsiUtil.isExternal(containingClass)) {
             containingClass.accept(implementationFinder);
         }
         psiMethod.accept(this);
@@ -66,11 +67,12 @@ public class SequenceGenerator extends JavaElementVisitor {
             for (PsiElement psiElement : psiElements) {
                 if (psiElement instanceof PsiMethod) {
                     PsiMethod psiMethod1 = (PsiMethod) psiElement;
-                    if (alreadyInStack(psiMethod1)) continue;
-
-                    if (!params.isSmartInterface() && params.getInterfaceImplFilter().allow(psiMethod1)) {
-                        methodAccept(psiMethod1);
+                    if (!alreadyInStack(psiMethod1)) {
+                        if (!smartInterface && params.getInterfaceImplFilter().allow(psiMethod1)) {
+                            methodAccept(psiMethod1);
+                        }
                     }
+
                 }
             }
         }
@@ -84,7 +86,6 @@ public class SequenceGenerator extends JavaElementVisitor {
     private void methodAccept(PsiMethod psiMethod) {
         if (params.getMethodFilter().allow(psiMethod)) {
             PsiClass containingClass = psiMethod.getContainingClass();
-            boolean smartInterface = params.isSmartInterface();
             boolean containingClassIsNotExternal = containingClass != null && !PsiUtil.isExternal(containingClass);
             if (smartInterface && containingClassIsNotExternal) {
                 containingClass.accept(implementationFinder);
@@ -166,31 +167,31 @@ public class SequenceGenerator extends JavaElementVisitor {
     }
 
     private void methodCall(PsiMethod psiMethod) {
-        if (psiMethod == null)
-            return;
-        if (!params.getMethodFilter().allow(psiMethod))
-            return;
-        else if (depth < params.getMaxDepth() - 1) {
-            CallStack oldStack = currentStack;
-            depth++;
-            LOGGER.debug("+ depth = " + depth + " method = " + psiMethod.getName());
-            generate(psiMethod);
-            depth--;
-            LOGGER.debug("- depth = " + depth + " method = " + psiMethod.getName());
-            currentStack = oldStack;
-        } else
-            currentStack.methodCall(createMethod(psiMethod));
+        if (psiMethod != null) {
+            if (params.getMethodFilter().allow(psiMethod)) {
+                if (depth < params.getMaxDepth() - 1) {
+                    CallStack oldStack = currentStack;
+                    depth++;
+                    LOGGER.debug("+ depth = " + depth + " method = " + psiMethod.getName());
+                    generate(psiMethod);
+                    depth--;
+                    LOGGER.debug("- depth = " + depth + " method = " + psiMethod.getName());
+                    currentStack = oldStack;
+                } else {
+                    currentStack.methodCall(createMethod(psiMethod));
+                }
+            }
+        }
     }
 
     private MethodDescription createMethod(PsiMethod psiMethod) {
         PsiParameter[] parameters = psiMethod.getParameterList().getParameters();
-        List argNames = new ArrayList();
-        List argTypes = new ArrayList();
-        for (int i = 0; i < parameters.length; i++) {
-            PsiParameter parameter = parameters[i];
+        List<String> argNames = new ArrayList<>();
+        List<String> argTypes = new ArrayList<>();
+        for (PsiParameter parameter : parameters) {
             argNames.add(parameter.getName());
             PsiType psiType = parameter.getType();
-            argTypes.add(psiType == null ? null : psiType.getCanonicalText());
+            argTypes.add(psiType.getCanonicalText());
         }
         PsiClass containingClass = psiMethod.getContainingClass();
         if (containingClass == null) {
@@ -212,9 +213,9 @@ public class SequenceGenerator extends JavaElementVisitor {
                 createAttributes(psiClass.getModifierList(), PsiUtil.isExternal(psiClass)));
     }
 
-    private List createAttributes(PsiModifierList psiModifierList, boolean external) {
+    private List<String> createAttributes(PsiModifierList psiModifierList, boolean external) {
         if (psiModifierList == null)
-            return Collections.EMPTY_LIST;
+            return new ArrayList<>();
         List attributes = new ArrayList();
         for (int i = 0; i < Info.RECOGNIZED_METHOD_ATTRIBUTES.length; i++) {
             String attribute = Info.RECOGNIZED_METHOD_ATTRIBUTES[i];
@@ -253,7 +254,7 @@ public class SequenceGenerator extends JavaElementVisitor {
     @Override
     public void visitAssignmentExpression(PsiAssignmentExpression expression) {
         PsiExpression re = expression.getRExpression();
-        if (params.isSmartInterface() && re instanceof PsiNewExpression) {
+        if (smartInterface && re instanceof PsiNewExpression) {
             String face = expression.getType().getCanonicalText();
             String impl = expression.getRExpression().getType().getCanonicalText();
 
@@ -279,7 +280,7 @@ public class SequenceGenerator extends JavaElementVisitor {
 
     private MethodDescription createMethod(PsiLambdaExpression expression) {
         PsiParameter[] parameters = expression.getParameterList().getParameters();
-        List argNames = new ArrayList();
+        List<String> argNames = new ArrayList<>();
         List argTypes = new ArrayList();
         for (int i = 0; i < parameters.length; i++) {
             PsiParameter parameter = parameters[i];
