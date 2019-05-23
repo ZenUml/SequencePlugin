@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SequenceGenerator extends JavaElementVisitor {
-    private final Stack<PsiCallExpression> _exprStack = new Stack<PsiCallExpression>();
-    private final Stack<CallStack> _callStack = new Stack<CallStack>();
+    private final Stack<PsiCallExpression> _exprStack = new Stack<>();
+    private final Stack<CallStack> _callStack = new Stack<>();
     private static final Logger LOGGER = Logger.getInstance(SequenceGenerator.class.getName());
 
     private final ImplementationFinder implementationFinder = new ImplementationFinder();
@@ -148,9 +148,6 @@ public class SequenceGenerator extends JavaElementVisitor {
 
     /**
      * If the psiMethod's containing class is Interface or abstract, then try to find it's implement class.
-     *
-     * @param callExpression
-     * @param psiMethod
      */
     private void findAbstractImplFilter(PsiCallExpression callExpression, PsiMethod psiMethod) {
         try {
@@ -281,12 +278,11 @@ public class SequenceGenerator extends JavaElementVisitor {
     private MethodDescription createMethod(PsiLambdaExpression expression) {
         PsiParameter[] parameters = expression.getParameterList().getParameters();
         List<String> argNames = new ArrayList<>();
-        List argTypes = new ArrayList();
-        for (int i = 0; i < parameters.length; i++) {
-            PsiParameter parameter = parameters[i];
+        List<String> argTypes = new ArrayList<>();
+        for (PsiParameter parameter : parameters) {
             argNames.add(parameter.getName());
             PsiType psiType = parameter.getType();
-            argTypes.add(psiType == null ? null : psiType.getCanonicalText());
+            argTypes.add(psiType.getCanonicalText());
         }
         String returnType;
         PsiType functionalInterfaceType = expression.getFunctionalInterfaceType();
@@ -335,7 +331,7 @@ public class SequenceGenerator extends JavaElementVisitor {
                     if (PsiUtil.isAbstract(psiClass)) {
                         String type = field.getType().getCanonicalText();
                         PsiExpression initializer = field.getInitializer();
-                        if (initializer != null && initializer instanceof PsiNewExpression) {
+                        if (initializer instanceof PsiNewExpression) {
                             String impl = initializer.getType().getCanonicalText();
                             if (!type.equals(impl)) {
                                 params.getInterfaceImplFilter().put(type, new ImplementClassFilter(impl));
