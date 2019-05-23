@@ -30,13 +30,18 @@ public class SequenceGenerator extends JavaElementVisitor {
     }
 
     public CallStack generate(PsiMethod psiMethod) {
+        PsiClass containingClass = getOwningClass(psiMethod);
+
+        followImplementation(psiMethod, containingClass);
+        return topStack;
+    }
+
+    private PsiClass getOwningClass(PsiMethod psiMethod) {
         PsiClass containingClass = psiMethod.getContainingClass();
         if (containingClass == null) {
             containingClass = (PsiClass) psiMethod.getParent().getContext();
         }
-
-        followImplementation(psiMethod, containingClass);
-        return topStack;
+        return containingClass;
     }
 
     private void followImplementation(PsiMethod psiMethod, PsiClass containingClass) {
@@ -190,10 +195,7 @@ public class SequenceGenerator extends JavaElementVisitor {
             PsiType psiType = parameter.getType();
             argTypes.add(psiType.getCanonicalText());
         }
-        PsiClass containingClass = psiMethod.getContainingClass();
-        if (containingClass == null) {
-            containingClass = (PsiClass) psiMethod.getParent().getContext();
-        }
+        PsiClass containingClass = getOwningClass(psiMethod);
         List attributes = createAttributes(psiMethod.getModifierList(), PsiUtil.isExternal(containingClass));
         if (psiMethod.isConstructor())
             return MethodDescription.createConstructorDescription(
@@ -268,8 +270,6 @@ public class SequenceGenerator extends JavaElementVisitor {
             topStack = new CallStack(method);
             currentStack = topStack;
         } else {
-            if (!true && currentStack.isRecursive(method))
-                return;
             currentStack = currentStack.methodCall(method);
         }
         super.visitLambdaExpression(expression);
@@ -293,10 +293,7 @@ public class SequenceGenerator extends JavaElementVisitor {
         }
 
         PsiMethod psiMethod = PsiUtil.findEncolsedPsiMethod(expression);
-        PsiClass containingClass = psiMethod.getContainingClass();
-        if (containingClass == null) {
-            containingClass = (PsiClass) psiMethod.getParent().getContext();
-        }
+        PsiClass containingClass = getOwningClass(psiMethod);
 
         return MethodDescription.createLambdaDescription(
                 createClassDescription(containingClass), argNames, argTypes, returnType);
