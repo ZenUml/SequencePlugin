@@ -1,10 +1,8 @@
 package org.intellij.sequencer.generator;
 
-import org.intellij.sequencer.config.Configuration;
 import org.intellij.sequencer.config.ExcludeEntry;
 import org.intellij.sequencer.generator.filters.*;
 
-import java.util.Iterator;
 import java.util.List;
 
 public class SequenceParams {
@@ -16,8 +14,7 @@ public class SequenceParams {
     private CompositeMethodFilter _methodFilter = new CompositeMethodFilter();
     private InterfaceImplFilter _implFilter = new InterfaceImplFilter();
 
-    public SequenceParams() {
-        List<ExcludeEntry> excludeList = Configuration.getInstance().getExcludeList();
+    public SequenceParams(List<ExcludeEntry> excludeList) {
         excludeList.stream().filter(ExcludeEntry::isEnabled).map(ExcludeEntry::getExcludeName).forEach(this::doSomething);
     }
 

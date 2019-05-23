@@ -1,0 +1,21 @@
+CallStack = SequenceGenerator.generate(psiMethod) {
+  containingClass = psiMethod.getContainingClass()
+  
+  if (containingClass == null) {
+    containingClass = psiMethod.getParentContext()
+  }
+  
+  if (PsiUtil.isAbstract(containingClass)) {
+    psiMethod.accept(this)
+    elements = DefinitionScopedSearch.search(psiMethod)
+    if(element.length == 1) {
+      methodAccept(psiElements_0)
+    } else {
+      foreach(elements) {
+        if(element.isPsiMethod()) {
+          methodAccept(ele)
+        }
+      }
+    }
+  }
+}

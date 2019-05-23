@@ -6,6 +6,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
+import org.intellij.sequencer.config.Configuration;
 import org.intellij.sequencer.generator.SequenceParams;
 import org.intellij.sequencer.generator.filters.NoConstructorsFilter;
 import org.intellij.sequencer.generator.filters.NoGetterSetterFilter;
@@ -46,7 +47,7 @@ public class ShowSequenceAction extends AnAction {
             _noConstructors = dialogWrapper.isNoConstructors();
             _smartInterface = dialogWrapper.isSmartInterface();
 
-            SequenceParams params = new SequenceParams();
+            SequenceParams params = new SequenceParams(Configuration.getInstance().getExcludeList());
             params.setMaxDepth(dialogWrapper.getCallStackDepth());
             params.setSmartInterface(dialogWrapper.isSmartInterface());
             params.getMethodFilter().addFilter(new ProjectOnlyFilter(_projectClassesOnly));
