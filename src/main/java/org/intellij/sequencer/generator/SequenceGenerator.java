@@ -39,14 +39,17 @@ public class SequenceGenerator extends JavaElementVisitor {
             psiMethod.accept(this);
             PsiElement[] psiElements = DefinitionsScopedSearch.search(psiMethod).toArray(PsiElement.EMPTY_ARRAY);
             if (psiElements.length == 1) {
-                methodAccept(psiElements[0]);
+                if (psiElements[0] instanceof PsiMethod) {
+                    methodAccept((PsiMethod) psiElements[0]);
+                }
             } else {
                 for (PsiElement psiElement : psiElements) {
                     if (psiElement instanceof PsiMethod) {
                         if (alreadyInStack((PsiMethod) psiElement)) continue;
 
-                        if (!params.isSmartInterface() && params.getInterfaceImplFilter().allow((PsiMethod) psiElement))
-                            methodAccept(psiElement);
+                        if (!params.isSmartInterface() && params.getInterfaceImplFilter().allow((PsiMethod) psiElement)) {
+                            methodAccept((PsiMethod) psiElement);
+                        }
                     }
                 }
             }
@@ -64,15 +67,13 @@ public class SequenceGenerator extends JavaElementVisitor {
         return currentStack.isRecursive(method);
     }
 
-    private void methodAccept(PsiElement psiElement) {
-        if (psiElement instanceof PsiMethod) {
-            PsiMethod method = (PsiMethod) psiElement;
-            if (params.getMethodFilter().allow(method)) {
-                PsiClass containingClass = (method).getContainingClass();
-                if (params.isSmartInterface() && containingClass != null && !PsiUtil.isExternal(containingClass))
-                    containingClass.accept(implementationFinder);
-                method.accept(this);
-            }
+    private void methodAccept(PsiMethod psiElement) {
+        PsiMethod method = psiElement;
+        if (params.getMethodFilter().allow(method)) {
+            PsiClass containingClass = (method).getContainingClass();
+            if (params.isSmartInterface() && containingClass != null && !PsiUtil.isExternal(containingClass))
+                containingClass.accept(implementationFinder);
+            method.accept(this);
         }
     }
 
