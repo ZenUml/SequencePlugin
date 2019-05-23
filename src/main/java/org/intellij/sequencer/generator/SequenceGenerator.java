@@ -81,13 +81,15 @@ public class SequenceGenerator extends JavaElementVisitor {
         return currentStack.isRecursive(method);
     }
 
-    private void methodAccept(PsiMethod psiElement) {
-        PsiMethod method = psiElement;
-        if (params.getMethodFilter().allow(method)) {
-            PsiClass containingClass = (method).getContainingClass();
-            if (params.isSmartInterface() && containingClass != null && !PsiUtil.isExternal(containingClass))
+    private void methodAccept(PsiMethod psiMethod) {
+        if (params.getMethodFilter().allow(psiMethod)) {
+            PsiClass containingClass = psiMethod.getContainingClass();
+            boolean smartInterface = params.isSmartInterface();
+            boolean containingClassIsNotExternal = containingClass != null && !PsiUtil.isExternal(containingClass);
+            if (smartInterface && containingClassIsNotExternal) {
                 containingClass.accept(implementationFinder);
-            method.accept(this);
+            }
+            psiMethod.accept(this);
         }
     }
 
