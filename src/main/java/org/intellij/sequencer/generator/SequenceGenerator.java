@@ -65,8 +65,9 @@ public class SequenceGenerator extends JavaElementVisitor {
         psiMethod.accept(this);
         PsiElement[] psiElements = DefinitionsScopedSearch.search(psiMethod).toArray(PsiElement.EMPTY_ARRAY);
         if (psiElements.length == 1) {
-            if (psiElements[0] instanceof PsiMethod) {
-                methodAccept((PsiMethod) psiElements[0]);
+            PsiElement psiElement = psiElements[0];
+            if (psiElement instanceof PsiMethod) {
+                methodAccept((PsiMethod) psiElement);
             }
         } else {
             for (PsiElement psiElement : psiElements) {
