@@ -10,6 +10,7 @@ import org.intellij.sequencer.generator.filters.ImplementClassFilter;
 import org.intellij.sequencer.util.PsiUtil;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class SequenceGenerator extends JavaElementVisitor {
@@ -64,40 +65,29 @@ public class SequenceGenerator extends JavaElementVisitor {
     private void followAbstractClass(PsiMethod psiMethod) {
         psiMethod.accept(this);
         PsiElement[] psiElements = DefinitionsScopedSearch.search(psiMethod).toArray(PsiElement.EMPTY_ARRAY);
-        if (psiElements.length == 1) {
-            PsiElement psiElement = psiElements[0];
-            if (psiElement instanceof PsiMethod) {
-                methodAccept((PsiMethod) psiElement);
-            }
-        } else {
-            for (PsiElement psiElement : psiElements) {
-                if (psiElement instanceof PsiMethod) {
-                    PsiMethod psiMethod1 = (PsiMethod) psiElement;
-                    if (!alreadyInStack(psiMethod1)) {
-                        if (!smartInterface && params.getInterfaceImplFilter().allow(psiMethod1)) {
-                            methodAccept(psiMethod1);
+        Arrays.stream(psiElements)
+                .filter(psiElement -> psiElement instanceof PsiMethod)
+                .map(psiElement -> (PsiMethod) psiElement)
+                .filter(psiMethod1 -> params.getMethodFilter().allow(psiMethod1))
+                .forEach(psiMethod1 -> {
+                    if (psiElements.length == 1) {
+                        PsiClass containingClass = psiMethod1.getContainingClass();
+                        boolean containingClassIsNotExternal = containingClass != null && !PsiUtil.isExternal(containingClass);
+                        if (smartInterface && containingClassIsNotExternal) {
+                            containingClass.accept(implementationFinder);
+                        }
+                        psiMethod1.accept(this);
+                    } else {
+                        if (!alreadyInStack(psiMethod1) && !smartInterface && params.getInterfaceImplFilter().allow(psiMethod1)) {
+                            psiMethod1.accept(this);
                         }
                     }
-
-                }
-            }
-        }
+                });
     }
 
     private boolean alreadyInStack(PsiMethod psiMethod) {
         MethodDescription method = createMethod(psiMethod);
         return currentStack.isRecursive(method);
-    }
-
-    private void methodAccept(PsiMethod psiMethod) {
-        if (params.getMethodFilter().allow(psiMethod)) {
-            PsiClass containingClass = psiMethod.getContainingClass();
-            boolean containingClassIsNotExternal = containingClass != null && !PsiUtil.isExternal(containingClass);
-            if (smartInterface && containingClassIsNotExternal) {
-                containingClass.accept(implementationFinder);
-            }
-            psiMethod.accept(this);
-        }
     }
 
     public void visitElement(PsiElement psiElement) {
