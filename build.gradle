@@ -6,7 +6,7 @@ plugins {
 //apply plugin: 'java'
 
 intellij {
-    version '14.1.2'
+    version 'IC-2019.1.2'
     pluginName 'SequenceDiagram'
     plugins = []
     updateSinceUntilBuild false
@@ -30,6 +30,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'junit:junit:4.12'
-    implementation 'junit:junit:4.12'
+    testCompile 'junit:junit:4.12'
+    testCompile group: 'org.assertj', name: 'assertj-core', version: '3.12.2'
+
 }
