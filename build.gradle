@@ -6,7 +6,7 @@ plugins {
 //apply plugin: 'java'
 
 intellij {
-    version '14.1.2'
+    version 'IC-2019.1.2'
     pluginName 'SequenceDiagram'
     plugins = []
     updateSinceUntilBuild false
