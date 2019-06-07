@@ -1,5 +1,6 @@
 package org.intellij.sequencer;
 
+import com.intellij.ide.scratch.NewZenUmlBufferAction;
 import com.intellij.ide.scratch.ScratchFileActions;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext;
@@ -102,7 +103,7 @@ public class SequencePlugin implements ProjectComponent {
                 String dsl = sequencePanel.generate();
                 addSequencePanel(sequencePanel);
 
-                ScratchFileActions.NewBufferAction newBufferAction = new ScratchFileActions.NewBufferAction();
+                NewZenUmlBufferAction newBufferAction = new NewZenUmlBufferAction();
 
                 HashMap<String, Object> map = new HashMap<>();
                 map.put(CommonDataKeys.PROJECT.getName(), event.getData(CommonDataKeys.PROJECT));
