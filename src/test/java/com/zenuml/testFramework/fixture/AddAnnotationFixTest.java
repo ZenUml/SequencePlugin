@@ -179,7 +179,7 @@ public class AddAnnotationFixTest extends UsefulTestCase {
 
     addDefaultLibrary();
     myFixture.configureByFiles("lib/p/TestPrimitive.java", "content/anno/p/annotations.xml");
-    myFixture.configureByFiles("lib/p/Test.java");
+    myFixture.configureByFiles("lib/p/AStrangeName.java");
     final PsiFile file = myFixture.getFile();
     final Editor editor = myFixture.getEditor();
 
@@ -309,7 +309,7 @@ public class AddAnnotationFixTest extends UsefulTestCase {
     addLibrary("/content/annoMultiRoot/root1", "/content/annoMultiRoot/root2");
     myFixture.configureByFiles("/content/annoMultiRoot/root1/multiRoot/annotations.xml",
                                "/content/annoMultiRoot/root2/multiRoot/annotations.xml");
-    myFixture.configureByFiles("lib/multiRoot/Test.java");
+    myFixture.configureByFiles("lib/multiRoot/AStrangeName.java");
 
     final ExternalAnnotationsManager manager = ExternalAnnotationsManager.getInstance(myFixture.getProject());
     final PsiMethod method = ((PsiJavaFile)myFixture.getFile()).getClasses()[0].getMethods()[0];
@@ -338,7 +338,7 @@ public class AddAnnotationFixTest extends UsefulTestCase {
 
   public void testListenerNotifiedWhenOperationsFail() {
     addLibrary(); // no annotation roots: all operations should fail
-    myFixture.configureByFiles("lib/p/Test.java");
+    myFixture.configureByFiles("lib/p/AStrangeName.java");
     final PsiMethod method = ((PsiJavaFile)myFixture.getFile()).getClasses()[0].getMethods()[0];
 
     startListening(method, AnnotationUtil.NOT_NULL, false);
@@ -361,7 +361,7 @@ public class AddAnnotationFixTest extends UsefulTestCase {
   public void testListenerNotifiedOnExternalChanges() throws IOException {
     addDefaultLibrary();
     myFixture.configureByFiles("/content/anno/p/annotations.xml");
-    myFixture.configureByFiles("lib/p/Test.java");
+    myFixture.configureByFiles("lib/p/AStrangeName.java");
 
     ExternalAnnotationsManager.getInstance(myFixture.getProject()).findExternalAnnotation(getOwner(), AnnotationUtil.NOT_NULL); // force creating service
 

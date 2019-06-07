@@ -1,4 +1,4 @@
-public class Test {
+public class AStrangeName {
   public void foo() {
     Runnable r = new Runnable() {
       public void run(){

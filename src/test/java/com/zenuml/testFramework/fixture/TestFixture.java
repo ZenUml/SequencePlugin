@@ -1,18 +1,12 @@
 package com.zenuml.testFramework.fixture;
 
-import com.intellij.JavaTestUtil;
 import com.intellij.codeInspection.emptyMethod.EmptyMethodInspection;
-import com.intellij.openapi.application.ex.PathManagerEx;
-import com.intellij.psi.PsiClass;
 import com.intellij.testFramework.InspectionTestCase;
-import com.intellij.testFramework.UsefulTestCase;
-import com.intellij.testFramework.builders.JavaModuleFixtureBuilder;
 import com.intellij.testFramework.fixtures.*;
-import org.junit.Test;
 
 import java.nio.file.Paths;
 
-public class TestFixture extends InspectionTestCase {
+public class TestFixture extends InspectionTestCaseZenUml {
 
     @Override
     protected String getTestDataPath() {
@@ -29,6 +23,8 @@ public class TestFixture extends InspectionTestCase {
     }
 
     public void testInAnonymous() {
-        doTest(true);
+        doTest();
+        System.out.println(myFixture.findClass("AStrangeName").getName());
+        System.out.println(myFixture.findClass("AStrangeName").getMethods().length);
     }
 }
