@@ -3,7 +3,6 @@ package com.zenuml.dsl;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.java.PsiMethodCallExpressionImpl;
 import com.intellij.psi.search.searches.DefinitionsScopedSearch;
-import com.intellij.util.containers.Stack;
 import org.intellij.sequencer.diagram.Info;
 import org.intellij.sequencer.generator.CallStack;
 import org.intellij.sequencer.generator.ClassDescription;
@@ -17,8 +16,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class PsiToDslNodeConverter extends JavaElementVisitor {
-
-    private final Stack<CallStack> _callStack = new Stack<>();
 
     private final ImplementationFinder implementationFinder = new ImplementationFinder();
     private CallStack topStack;
@@ -93,13 +90,10 @@ public class PsiToDslNodeConverter extends JavaElementVisitor {
     @Override
     public void visitCallExpression(PsiCallExpression callExpression) {
         if (PsiUtil.isPipeline(callExpression)) {
-            _callStack.push(currentStack);
-
             callExpression.getFirstChild().acceptChildren(this);
 
             super.visitCallExpression(callExpression);
         } else if (PsiUtil.isComplexCall(callExpression)) {
-            _callStack.push(currentStack);
             super.visitCallExpression(callExpression);
         } else {
             PsiMethod psiMethod = callExpression.resolveMethod();
@@ -112,8 +106,6 @@ public class PsiToDslNodeConverter extends JavaElementVisitor {
     /**
      * If the psiMethod's containing class is Interface or abstract, then try to find it's implement class.
      *
-     * @param callExpression
-     * @param psiMethod
      */
     private void findAbstractImplFilter(PsiCallExpression callExpression, PsiMethod psiMethod) {
         try {
