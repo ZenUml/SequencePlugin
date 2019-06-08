@@ -104,21 +104,21 @@ public class MethodDescription {
         return _hashCode;
     }
 
-    static MethodDescription createMethodDescription(ClassDescription classDescription,
+    public static MethodDescription createMethodDescription(ClassDescription classDescription,
                                                      List attributes, String methodName,
                                                      String returnType,
                                                      List argNames, List argTypes) {
         return new MethodDescription(classDescription, attributes, methodName, returnType, argNames, argTypes);
     }
 
-    static MethodDescription createConstructorDescription(ClassDescription classDescription,
+    public static MethodDescription createConstructorDescription(ClassDescription classDescription,
                                                           List attributes, List argNames,
                                                           List argTypes) {
         return new MethodDescription(classDescription, attributes, Constants.CONSTRUCTOR_METHOD_NAME,
                 classDescription.getClassName(), argNames, argTypes);
     }
 
-    static MethodDescription createLambdaDescription(ClassDescription classDescription,
+    public static MethodDescription createLambdaDescription(ClassDescription classDescription,
                                                      List argNames, List argTypes, String returnType) {
         return new MethodDescription(classDescription,
                 new ArrayList(), Constants.Lambda_Invoke, returnType, argNames, argTypes);
