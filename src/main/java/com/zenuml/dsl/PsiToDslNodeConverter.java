@@ -19,7 +19,7 @@ public class PsiToDslNodeConverter extends JavaElementVisitor {
 
     private final ImplementationFinder implementationFinder = new ImplementationFinder();
 //    private CallStack topStack;
-    private CallStack currentStack;
+//    private CallStack currentStack;
     private int depth;
     private SequenceParams params;
     private SequenceDiagram sequenceDiagram = new SequenceDiagram();
@@ -43,7 +43,7 @@ public class PsiToDslNodeConverter extends JavaElementVisitor {
             } else {
                 for (PsiElement psiElement : psiElements) {
                     if (psiElement instanceof PsiMethod) {
-                        if (alreadyInStack((PsiMethod) psiElement)) continue;
+//                        if (alreadyInStack((PsiMethod) psiElement)) continue;
 
                         if (!params.isSmartInterface() && params.getInterfaceImplFilter().allow((PsiMethod) psiElement))
                             methodAccept(psiElement);
@@ -57,11 +57,6 @@ public class PsiToDslNodeConverter extends JavaElementVisitor {
             psiMethod.accept(this);
         }
         sequenceDiagram.end();
-    }
-
-    private boolean alreadyInStack(PsiMethod psiMethod) {
-        MethodDescription method = createMethod(psiMethod);
-        return currentStack.isReqursive(method);
     }
 
     private void methodAccept(PsiElement psiElement) {
@@ -124,16 +119,13 @@ public class PsiToDslNodeConverter extends JavaElementVisitor {
     private void methodCall(PsiMethod psiMethod) {
         if (psiMethod == null)
             return;
-        if (!params.getMethodFilter().allow(psiMethod))
-            return;
-        else if (depth < 5 - 1) {
-            CallStack oldStack = currentStack;
-            depth++;
-            generate(psiMethod);
-            depth--;
-            currentStack = oldStack;
-        } else
-            currentStack.methodCall(createMethod(psiMethod));
+        if (params.getMethodFilter().allow(psiMethod)) {
+            if (depth < 5 - 1) {
+                depth++;
+                generate(psiMethod);
+                depth--;
+            }
+        }
     }
 
     private MethodDescription createMethod(PsiMethod psiMethod) {
