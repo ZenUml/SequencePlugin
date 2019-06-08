@@ -28,7 +28,7 @@ public abstract class DslNode {
         return node;
     }
 
-    abstract void toDsl(StringBuffer output);
+    public abstract void toDsl(StringBuffer output);
 
 
     protected void printChindren(StringBuffer output) {
