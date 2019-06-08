@@ -18,7 +18,7 @@ import java.util.List;
 public class PsiToDslNodeConverter extends JavaElementVisitor {
 
     private final ImplementationFinder implementationFinder = new ImplementationFinder();
-    private CallStack topStack;
+//    private CallStack topStack;
     private CallStack currentStack;
     private int depth;
     private SequenceParams params;
@@ -217,47 +217,6 @@ public class PsiToDslNodeConverter extends JavaElementVisitor {
         super.visitAssignmentExpression(expression);
     }
 
-    @Override
-    public void visitLambdaExpression(PsiLambdaExpression expression) {
-        MethodDescription method = createMethod(expression);
-        if (topStack == null) {
-            topStack = new CallStack(method);
-            currentStack = topStack;
-        } else {
-//            if (!params.isAllowRecursion() && currentStack.isReqursive(method))
-//                return;
-            currentStack = currentStack.methodCall(method);
-        }
-        super.visitLambdaExpression(expression);
-    }
-
-    private MethodDescription createMethod(PsiLambdaExpression expression) {
-        PsiParameter[] parameters = expression.getParameterList().getParameters();
-        List argNames = new ArrayList();
-        List argTypes = new ArrayList();
-        for (int i = 0; i < parameters.length; i++) {
-            PsiParameter parameter = parameters[i];
-            argNames.add(parameter.getName());
-            PsiType psiType = parameter.getType();
-            argTypes.add(psiType == null ? null : psiType.getCanonicalText());
-        }
-        String returnType;
-        PsiType functionalInterfaceType = expression.getFunctionalInterfaceType();
-        if (functionalInterfaceType == null) {
-            returnType = null;
-        } else {
-            returnType = functionalInterfaceType.getCanonicalText();
-        }
-
-        PsiMethod psiMethod = PsiUtil.findEncolsedPsiMethod(expression);
-        PsiClass containingClass = psiMethod.getContainingClass();
-        if (containingClass == null) {
-            containingClass = (PsiClass) psiMethod.getParent().getContext();
-        }
-
-        return MethodDescription.createLambdaDescription(
-                createClassDescription(containingClass), argNames, argTypes, returnType);
-    }
 
     @Override
     public void visitInstanceOfExpression(PsiInstanceOfExpression expression) {
