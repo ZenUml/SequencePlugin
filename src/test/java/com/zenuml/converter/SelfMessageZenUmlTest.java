@@ -7,5 +7,6 @@ public class SelfMessageZenUmlTest extends ZenUmlTestCase {
         myFixture.copyDirectoryToProject(getTestName(true),"");
         System.out.println(myFixture.findClass("SelfMessage").getName());
         System.out.println(myFixture.findClass("SelfMessage").getMethods()[0]);
+        System.out.println(myFixture.findClass("SelfMessage").getMethods()[1]);
     }
 }
