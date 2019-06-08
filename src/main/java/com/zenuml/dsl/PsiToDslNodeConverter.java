@@ -3,23 +3,13 @@ package com.zenuml.dsl;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.java.PsiMethodCallExpressionImpl;
 import com.intellij.psi.search.searches.DefinitionsScopedSearch;
-import org.intellij.sequencer.diagram.Info;
-import org.intellij.sequencer.generator.CallStack;
-import org.intellij.sequencer.generator.ClassDescription;
-import org.intellij.sequencer.generator.MethodDescription;
 import org.intellij.sequencer.generator.SequenceParams;
 import org.intellij.sequencer.generator.filters.ImplementClassFilter;
 import org.intellij.sequencer.util.PsiUtil;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 public class PsiToDslNodeConverter extends JavaElementVisitor {
 
     private final ImplementationFinder implementationFinder = new ImplementationFinder();
-//    private CallStack topStack;
-//    private CallStack currentStack;
     private int depth;
     private SequenceParams params;
     private SequenceDiagram sequenceDiagram = new SequenceDiagram();
@@ -43,8 +33,6 @@ public class PsiToDslNodeConverter extends JavaElementVisitor {
             } else {
                 for (PsiElement psiElement : psiElements) {
                     if (psiElement instanceof PsiMethod) {
-//                        if (alreadyInStack((PsiMethod) psiElement)) continue;
-
                         if (!params.isSmartInterface() && params.getInterfaceImplFilter().allow((PsiMethod) psiElement))
                             methodAccept(psiElement);
                     }
@@ -76,7 +64,6 @@ public class PsiToDslNodeConverter extends JavaElementVisitor {
     }
 
     public void visitMethod(PsiMethod psiMethod) {
-        MethodDescription method = createMethod(psiMethod);
         assert psiMethod.getContainingClass() != null;
         sequenceDiagram.addSub(new FunctionNode(psiMethod.getContainingClass().getName(), psiMethod.getName(), null));
         super.visitMethod(psiMethod);
@@ -126,52 +113,6 @@ public class PsiToDslNodeConverter extends JavaElementVisitor {
                 depth--;
             }
         }
-    }
-
-    private MethodDescription createMethod(PsiMethod psiMethod) {
-        PsiParameter[] parameters = psiMethod.getParameterList().getParameters();
-        List argNames = new ArrayList();
-        List argTypes = new ArrayList();
-        for (int i = 0; i < parameters.length; i++) {
-            PsiParameter parameter = parameters[i];
-            argNames.add(parameter.getName());
-            PsiType psiType = parameter.getType();
-            argTypes.add(psiType == null ? null : psiType.getCanonicalText());
-        }
-        PsiClass containingClass = psiMethod.getContainingClass();
-        if (containingClass == null) {
-            containingClass = (PsiClass) psiMethod.getParent().getContext();
-        }
-        List attributes = createAttributes(psiMethod.getModifierList(), PsiUtil.isExternal(containingClass));
-        if (psiMethod.isConstructor())
-            return MethodDescription.createConstructorDescription(
-                    createClassDescription(containingClass),
-                    attributes, argNames, argTypes);
-        return MethodDescription.createMethodDescription(
-                createClassDescription(containingClass),
-                attributes, psiMethod.getName(), psiMethod.getReturnType().getCanonicalText(),
-                argNames, argTypes);
-    }
-
-    private ClassDescription createClassDescription(PsiClass psiClass) {
-        return new ClassDescription(psiClass.getQualifiedName(),
-                createAttributes(psiClass.getModifierList(), PsiUtil.isExternal(psiClass)));
-    }
-
-    private List createAttributes(PsiModifierList psiModifierList, boolean external) {
-        if (psiModifierList == null)
-            return Collections.EMPTY_LIST;
-        List attributes = new ArrayList();
-        for (int i = 0; i < Info.RECOGNIZED_METHOD_ATTRIBUTES.length; i++) {
-            String attribute = Info.RECOGNIZED_METHOD_ATTRIBUTES[i];
-            if (psiModifierList.hasModifierProperty(attribute))
-                attributes.add(attribute);
-        }
-        if (external)
-            attributes.add(Info.EXTERNAL_ATTRIBUTE);
-        if (PsiUtil.isInterface(psiModifierList))
-            attributes.add(Info.INTERFACE_ATTRIBUTE);
-        return attributes;
     }
 
     @Override
