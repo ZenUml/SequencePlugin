@@ -73,36 +73,34 @@ public class PsiToDslNodeConverter extends JavaElementVisitor {
     public void visitCallExpression(PsiCallExpression callExpression) {
         if (PsiUtil.isPipeline(callExpression)) {
             callExpression.getFirstChild().acceptChildren(this);
-
-            super.visitCallExpression(callExpression);
-        } else if (PsiUtil.isComplexCall(callExpression)) {
-            super.visitCallExpression(callExpression);
         } else {
-            PsiMethod psiMethod = callExpression.resolveMethod();
-            findAbstractImplFilter(callExpression, psiMethod);
-            if (psiMethod != null) {
-                if (depth < 5) {
-                    depth++;
-                    generate(psiMethod);
-                    depth--;
+            if (!PsiUtil.isComplexCall(callExpression)) {
+                PsiMethod psiMethod = callExpression.resolveMethod();
+                if (psiMethod != null) {
+                    findAbstractImplFilter(callExpression, psiMethod.getContainingClass());
+                    if (depth < 5) {
+                        depth++;
+                        generate(psiMethod);
+                        depth--;
+                    }
                 }
             }
-            super.visitCallExpression(callExpression);
         }
+        super.visitCallExpression(callExpression);
     }
 
     /**
      * If the psiMethod's containing class is Interface or abstract, then try to find it's implement class.
      *
      */
-    private void findAbstractImplFilter(PsiCallExpression callExpression, PsiMethod psiMethod) {
+    private void findAbstractImplFilter(PsiCallExpression callExpression, PsiClass containingClass) {
         try {
-            PsiClass containingClass = psiMethod.getContainingClass();
             if (PsiUtil.isAbstract(containingClass)) {
                 String type = containingClass.getQualifiedName();
                 String impl = ((PsiMethodCallExpressionImpl) callExpression).getMethodExpression().getQualifierExpression().getType().getCanonicalText();
-                if (!impl.startsWith(type))
+                if (!impl.startsWith(type)) {
                     params.getInterfaceImplFilter().put(type, new ImplementClassFilter(impl));
+                }
             }
         } catch (Exception e) {
             //ignore
