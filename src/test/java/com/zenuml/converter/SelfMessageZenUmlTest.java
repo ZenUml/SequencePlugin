@@ -22,8 +22,7 @@ public class SelfMessageZenUmlTest extends ZenUmlTestCase {
         myFixture.copyDirectoryToProject("selfMessage","");
         PsiClass selfMessageClass = myFixture.findClass("selfMessage.SelfMessage");
         PsiMethod clientMethod = selfMessageClass.findMethodsByName("clientMethod", true)[0];
-
-        psiToDslNodeConverter.generate(clientMethod);
+        clientMethod.accept(psiToDslNodeConverter);
         SequenceDiagram rootNode = psiToDslNodeConverter.rootNode();
         rootNode.toDsl();
         assertThat(rootNode.toDsl(), is("SelfMessage.clientMethod{\n  SelfMessage.internalMethod;\n}"));
@@ -31,10 +30,11 @@ public class SelfMessageZenUmlTest extends ZenUmlTestCase {
 
     public void test_convert_to_dsl_node_differentClass() {
         myFixture.copyDirectoryToProject("differentClass","");
-        PsiClass selfMessageClass = myFixture.findClass("differentClass.FirstClass");
-        PsiMethod selfMethod = selfMessageClass.findMethodsByName("clientMethod", true)[0];
+        PsiClass firstClass = myFixture.findClass("differentClass.FirstClass");
+        PsiMethod clientMethod = firstClass.findMethodsByName("clientMethod", true)[0];
 
-        psiToDslNodeConverter.generate(selfMethod);
+        clientMethod.accept(psiToDslNodeConverter);
+
         SequenceDiagram rootNode = psiToDslNodeConverter.rootNode();
         rootNode.toDsl();
         assertThat(rootNode.toDsl(), is("FirstClass.clientMethod{\n  SecondClass.method1;\n}"));
