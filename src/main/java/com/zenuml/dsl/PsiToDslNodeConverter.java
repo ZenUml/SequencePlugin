@@ -18,35 +18,6 @@ public class PsiToDslNodeConverter extends JavaElementVisitor {
         this.params = new SequenceParams();
     }
 
-    public void generate(PsiMethod psiMethod) {
-        PsiClass containingClass = psiMethod.getContainingClass();
-        if (containingClass == null) {
-            containingClass = (PsiClass) psiMethod.getParent().getContext();
-        }
-
-        // follow implementation
-        if (PsiUtil.isAbstract(containingClass)) {
-            psiMethod.accept(this);
-            PsiElement[] psiElements = DefinitionsScopedSearch.search(psiMethod).toArray(PsiElement.EMPTY_ARRAY);
-            if (psiElements.length == 1) {
-                methodAccept(psiElements[0]);
-            } else {
-                for (PsiElement psiElement : psiElements) {
-                    if (psiElement instanceof PsiMethod) {
-                        if (!params.isSmartInterface() && params.getInterfaceImplFilter().allow((PsiMethod) psiElement))
-                            methodAccept(psiElement);
-                    }
-                }
-            }
-        } else {
-            // resolve variable initializer
-            if (params.isSmartInterface() && !PsiUtil.isExternal(containingClass))
-                containingClass.accept(implementationFinder);
-            psiMethod.accept(this);
-        }
-        sequenceDiagram.end();
-    }
-
     private void methodAccept(PsiElement psiElement) {
         if (psiElement instanceof PsiMethod) {
             PsiMethod method = (PsiMethod) psiElement;
@@ -84,15 +55,45 @@ public class PsiToDslNodeConverter extends JavaElementVisitor {
                             params.getInterfaceImplFilter().put(type, new ImplementClassFilter(impl));
                         }
                     }
-                    if (depth < 5) {
-                        depth++;
-                        generate(psiMethod);
-                        depth--;
-                    }
+                    generate(psiMethod);
                 }
             }
         }
         super.visitCallExpression(callExpression);
+    }
+
+    public void generate(PsiMethod psiMethod) {
+        if (depth >= 5) {
+            return;
+        }
+        depth++;
+        PsiClass containingClass = psiMethod.getContainingClass();
+        if (containingClass == null) {
+            containingClass = (PsiClass) psiMethod.getParent().getContext();
+        }
+
+        // follow implementation
+        if (PsiUtil.isAbstract(containingClass)) {
+            psiMethod.accept(this);
+            PsiElement[] psiElements = DefinitionsScopedSearch.search(psiMethod).toArray(PsiElement.EMPTY_ARRAY);
+            if (psiElements.length == 1) {
+                methodAccept(psiElements[0]);
+            } else {
+                for (PsiElement psiElement : psiElements) {
+                    if (psiElement instanceof PsiMethod) {
+                        if (!params.isSmartInterface() && params.getInterfaceImplFilter().allow((PsiMethod) psiElement))
+                            methodAccept(psiElement);
+                    }
+                }
+            }
+        } else {
+            // resolve variable initializer
+            if (params.isSmartInterface() && !PsiUtil.isExternal(containingClass))
+                containingClass.accept(implementationFinder);
+            psiMethod.accept(this);
+        }
+        sequenceDiagram.end();
+        depth--;
     }
 
     @Override
