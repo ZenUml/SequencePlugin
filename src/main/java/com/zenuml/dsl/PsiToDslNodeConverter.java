@@ -49,41 +49,37 @@ public class PsiToDslNodeConverter extends JavaElementVisitor {
             } else {
                 if (!PsiUtil.isComplexCall(callExpression)) {
                     PsiMethod psiMethod = callExpression.resolveMethod();
-                    if (psiMethod != null) {
-                        String type = psiMethod.getContainingClass().getQualifiedName();
-                        if (PsiUtil.isAbstract(psiMethod.getContainingClass())) {
-                            String impl = ((PsiMethodCallExpressionImpl) callExpression).getMethodExpression().getQualifierExpression().getType().getCanonicalText();
-                            if (!impl.startsWith(type)) {
-                                params.getInterfaceImplFilter().put(type, new ImplementClassFilter(impl));
-                            }
-                        }
-                        PsiClass containingClass = psiMethod.getContainingClass();
-                        if (containingClass == null) {
-                            containingClass = (PsiClass) psiMethod.getParent().getContext();
+                    if (psiMethod == null) return;
+                    PsiClass containingClass = psiMethod.getContainingClass();
+                    assert containingClass != null;
+                    String qualifiedClassName = containingClass.getQualifiedName();
+                    // follow implementation
+                    if (PsiUtil.isAbstract(containingClass)) {
+                        PsiExpression qualifierExpression = ((PsiMethodCallExpressionImpl) callExpression).getMethodExpression().getQualifierExpression();
+                        String impl = qualifierExpression.getType().getCanonicalText();
+                        if (!impl.startsWith(qualifiedClassName)) {
+                            params.getInterfaceImplFilter().put(qualifiedClassName, new ImplementClassFilter(impl));
                         }
 
-                        // follow implementation
-                        if (PsiUtil.isAbstract(containingClass)) {
-                            psiMethod.accept(this);
-                            PsiElement[] psiElements = DefinitionsScopedSearch.search(psiMethod).toArray(PsiElement.EMPTY_ARRAY);
-                            if (psiElements.length == 1) {
-                                methodAccept(psiElements[0]);
-                            } else {
-                                for (PsiElement psiElement : psiElements) {
-                                    if (psiElement instanceof PsiMethod) {
-                                        if (!params.isSmartInterface() && params.getInterfaceImplFilter().allow((PsiMethod) psiElement))
-                                            methodAccept(psiElement);
-                                    }
+                        psiMethod.accept(this);
+                        PsiElement[] psiElements = DefinitionsScopedSearch.search(psiMethod).toArray(PsiElement.EMPTY_ARRAY);
+                        if (psiElements.length == 1) {
+                            methodAccept(psiElements[0]);
+                        } else {
+                            for (PsiElement psiElement : psiElements) {
+                                if (psiElement instanceof PsiMethod) {
+                                    if (!params.isSmartInterface() && params.getInterfaceImplFilter().allow((PsiMethod) psiElement))
+                                        methodAccept(psiElement);
                                 }
                             }
-                        } else {
-                            // resolve variable initializer
-                            if (params.isSmartInterface() && !PsiUtil.isExternal(containingClass))
-                                containingClass.accept(implementationFinder);
-                            psiMethod.accept(this);
                         }
-                        sequenceDiagram.end();
+                    } else {
+                        // resolve variable initializer
+                        if (params.isSmartInterface() && !PsiUtil.isExternal(containingClass))
+                            containingClass.accept(implementationFinder);
+                        psiMethod.accept(this);
                     }
+                    sequenceDiagram.end();
                 }
             }
             super.visitCallExpression(callExpression);
