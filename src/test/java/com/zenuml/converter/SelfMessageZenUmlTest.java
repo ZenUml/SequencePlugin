@@ -2,7 +2,6 @@ package com.zenuml.converter;
 
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMethod;
-import com.zenuml.dsl.DslNode;
 import com.zenuml.dsl.PsiToDslNodeConverter;
 import com.zenuml.dsl.SequenceDiagram;
 import com.zenuml.testFramework.fixture.ZenUmlTestCase;
@@ -22,9 +21,9 @@ public class SelfMessageZenUmlTest extends ZenUmlTestCase {
         myFixture.copyDirectoryToProject("selfMessage","");
         PsiToDslNodeConverter psiToDslNodeConverter = new PsiToDslNodeConverter();
         PsiClass selfMessageClass = myFixture.findClass("SelfMessage");
-        PsiMethod internalMethod = selfMessageClass.findMethodsByName("selfMethod", true)[0];
-        internalMethod.accept(psiToDslNodeConverter);
+        PsiMethod selfMethod = selfMessageClass.findMethodsByName("selfMethod", true)[0];
 
+        psiToDslNodeConverter.generate(selfMethod);
         SequenceDiagram rootNode = psiToDslNodeConverter.rootNode();
         rootNode.toDsl();
         assertThat(rootNode.toDsl(), is("SelfMessage.selfMethod{\n  SelfMessage.internalMethod;\n}"));
