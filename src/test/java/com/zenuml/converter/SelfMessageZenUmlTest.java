@@ -20,7 +20,7 @@ public class SelfMessageZenUmlTest extends ZenUmlTestCase {
     public void test_convert_to_dsl_node() {
         myFixture.copyDirectoryToProject("selfMessage","");
         PsiToDslNodeConverter psiToDslNodeConverter = new PsiToDslNodeConverter();
-        PsiClass selfMessageClass = myFixture.findClass("SelfMessage");
+        PsiClass selfMessageClass = myFixture.findClass("selfMessage.SelfMessage");
         PsiMethod selfMethod = selfMessageClass.findMethodsByName("selfMethod", true)[0];
 
         psiToDslNodeConverter.generate(selfMethod);

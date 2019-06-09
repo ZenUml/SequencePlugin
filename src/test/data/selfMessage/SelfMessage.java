@@ -1,3 +1,5 @@
+package selfMessage;
+
 public class SelfMessage {
     public void selfMethod() {
         internalMethod();
