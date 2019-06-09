@@ -5,6 +5,7 @@ import com.intellij.psi.impl.source.tree.java.PsiMethodCallExpressionImpl;
 import com.intellij.psi.search.searches.DefinitionsScopedSearch;
 import org.intellij.sequencer.generator.SequenceParams;
 import org.intellij.sequencer.generator.filters.ImplementClassFilter;
+import org.intellij.sequencer.generator.filters.InterfaceImplFilter;
 import org.intellij.sequencer.util.PsiUtil;
 
 public class PsiToDslNodeConverter extends JavaElementVisitor {
@@ -12,10 +13,13 @@ public class PsiToDslNodeConverter extends JavaElementVisitor {
     private final ImplementationFinder implementationFinder = new ImplementationFinder();
     private int depth;
     private SequenceParams params;
+    private InterfaceImplFilter implFilter;
+
     private SequenceDiagram sequenceDiagram = new SequenceDiagram();
 
     public PsiToDslNodeConverter() {
         this.params = new SequenceParams();
+        implFilter = params.getInterfaceImplFilter();
     }
 
     private void methodAccept(PsiElement psiElement) {
@@ -58,7 +62,7 @@ public class PsiToDslNodeConverter extends JavaElementVisitor {
                         PsiExpression qualifierExpression = ((PsiMethodCallExpressionImpl) callExpression).getMethodExpression().getQualifierExpression();
                         String impl = qualifierExpression.getType().getCanonicalText();
                         if (!impl.startsWith(qualifiedClassName)) {
-                            params.getInterfaceImplFilter().put(qualifiedClassName, new ImplementClassFilter(impl));
+                            implFilter.put(qualifiedClassName, new ImplementClassFilter(impl));
                         }
 
                         psiMethod.accept(this);
@@ -68,7 +72,7 @@ public class PsiToDslNodeConverter extends JavaElementVisitor {
                         } else {
                             for (PsiElement psiElement : psiElements) {
                                 if (psiElement instanceof PsiMethod) {
-                                    if (!params.isSmartInterface() && params.getInterfaceImplFilter().allow((PsiMethod) psiElement))
+                                    if (!params.isSmartInterface() && implFilter.allow((PsiMethod) psiElement))
                                         methodAccept(psiElement);
                                 }
                             }
@@ -99,7 +103,7 @@ public class PsiToDslNodeConverter extends JavaElementVisitor {
                 if (initializer instanceof PsiNewExpression) {
                     String impl = initializer.getType().getCanonicalText();
                     if (!type.equals(impl)) {
-                        params.getInterfaceImplFilter().put(type, new ImplementClassFilter(impl));
+                        implFilter.put(type, new ImplementClassFilter(impl));
                     }
                 }
             }
@@ -116,7 +120,7 @@ public class PsiToDslNodeConverter extends JavaElementVisitor {
             String face = expression.getType().getCanonicalText();
             String impl = expression.getRExpression().getType().getCanonicalText();
 
-            params.getInterfaceImplFilter().put(face, new ImplementClassFilter(impl));
+            implFilter.put(face, new ImplementClassFilter(impl));
 
         }
         super.visitAssignmentExpression(expression);
@@ -155,7 +159,7 @@ public class PsiToDslNodeConverter extends JavaElementVisitor {
                         if (initializer != null && initializer instanceof PsiNewExpression) {
                             String impl = initializer.getType().getCanonicalText();
                             if (!type.equals(impl)) {
-                                params.getInterfaceImplFilter().put(type, new ImplementClassFilter(impl));
+                                implFilter.put(type, new ImplementClassFilter(impl));
                             }
                         }
                     }
@@ -182,7 +186,7 @@ public class PsiToDslNodeConverter extends JavaElementVisitor {
                 String face = expression.getType().getCanonicalText();
                 String impl = expression.getRExpression().getType().getCanonicalText();
 
-                params.getInterfaceImplFilter().put(face, new ImplementClassFilter(impl));
+                implFilter.put(face, new ImplementClassFilter(impl));
 
             }
             super.visitAssignmentExpression(expression);
