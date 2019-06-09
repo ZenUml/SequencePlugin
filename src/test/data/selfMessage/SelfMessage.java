@@ -1,7 +1,7 @@
 package selfMessage;
 
 public class SelfMessage {
-    public void selfMethod() {
+    public void clientMethod() {
         internalMethod();
     }
 

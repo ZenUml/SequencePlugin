@@ -11,9 +11,4 @@ public class ZenUmlTestCase extends LightCodeInsightFixtureTestCase {
         return Paths.get("src/test/data/").toAbsolutePath().toString();
     }
 
-    public void testSelfMessage() {
-        myFixture.copyDirectoryToProject(getTestName(true),"");
-        System.out.println(myFixture.findClass("SelfMessage").getName());
-        System.out.println(myFixture.findClass("SelfMessage").getMethods().length);
-    }
 }

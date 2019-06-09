@@ -10,22 +10,33 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 public class SelfMessageZenUmlTest extends ZenUmlTestCase {
-    public void testSelfMessage() {
-        myFixture.copyDirectoryToProject(getTestName(true),"");
-        System.out.println(myFixture.findClass("SelfMessage").getName());
-        System.out.println(myFixture.findClass("SelfMessage").getMethods()[0]);
-        System.out.println(myFixture.findClass("SelfMessage").getMethods()[1]);
+
+    private PsiToDslNodeConverter psiToDslNodeConverter;
+
+    public void setUp() throws Exception {
+        super.setUp();
+        psiToDslNodeConverter = new PsiToDslNodeConverter();
+
+    }
+    public void test_convert_to_dsl_node_selfMessage() {
+        myFixture.copyDirectoryToProject("selfMessage","");
+        PsiClass selfMessageClass = myFixture.findClass("selfMessage.SelfMessage");
+        PsiMethod clientMethod = selfMessageClass.findMethodsByName("clientMethod", true)[0];
+
+        psiToDslNodeConverter.generate(clientMethod);
+        SequenceDiagram rootNode = psiToDslNodeConverter.rootNode();
+        rootNode.toDsl();
+        assertThat(rootNode.toDsl(), is("SelfMessage.clientMethod{\n  SelfMessage.internalMethod;\n}"));
     }
 
-    public void test_convert_to_dsl_node() {
-        myFixture.copyDirectoryToProject("selfMessage","");
-        PsiToDslNodeConverter psiToDslNodeConverter = new PsiToDslNodeConverter();
-        PsiClass selfMessageClass = myFixture.findClass("selfMessage.SelfMessage");
-        PsiMethod selfMethod = selfMessageClass.findMethodsByName("selfMethod", true)[0];
+    public void test_convert_to_dsl_node_differentClass() {
+        myFixture.copyDirectoryToProject("differentClass","");
+        PsiClass selfMessageClass = myFixture.findClass("differentClass.FirstClass");
+        PsiMethod selfMethod = selfMessageClass.findMethodsByName("clientMethod", true)[0];
 
         psiToDslNodeConverter.generate(selfMethod);
         SequenceDiagram rootNode = psiToDslNodeConverter.rootNode();
         rootNode.toDsl();
-        assertThat(rootNode.toDsl(), is("SelfMessage.selfMethod{\n  SelfMessage.internalMethod;\n}"));
+        assertThat(rootNode.toDsl(), is("FirstClass.clientMethod{\n  SecondClass.method1;\n}"));
     }
 }
