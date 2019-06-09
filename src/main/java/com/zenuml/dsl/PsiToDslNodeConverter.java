@@ -77,7 +77,13 @@ public class PsiToDslNodeConverter extends JavaElementVisitor {
             if (!PsiUtil.isComplexCall(callExpression)) {
                 PsiMethod psiMethod = callExpression.resolveMethod();
                 if (psiMethod != null) {
-                    findAbstractImplFilter(callExpression, psiMethod.getContainingClass());
+                    String type = psiMethod.getContainingClass().getQualifiedName();
+                    if (PsiUtil.isAbstract(psiMethod.getContainingClass())) {
+                        String impl = ((PsiMethodCallExpressionImpl) callExpression).getMethodExpression().getQualifierExpression().getType().getCanonicalText();
+                        if (!impl.startsWith(type)) {
+                            params.getInterfaceImplFilter().put(type, new ImplementClassFilter(impl));
+                        }
+                    }
                     if (depth < 5) {
                         depth++;
                         generate(psiMethod);
@@ -87,24 +93,6 @@ public class PsiToDslNodeConverter extends JavaElementVisitor {
             }
         }
         super.visitCallExpression(callExpression);
-    }
-
-    /**
-     * If the psiMethod's containing class is Interface or abstract, then try to find it's implement class.
-     *
-     */
-    private void findAbstractImplFilter(PsiCallExpression callExpression, PsiClass containingClass) {
-        try {
-            if (PsiUtil.isAbstract(containingClass)) {
-                String type = containingClass.getQualifiedName();
-                String impl = ((PsiMethodCallExpressionImpl) callExpression).getMethodExpression().getQualifierExpression().getType().getCanonicalText();
-                if (!impl.startsWith(type)) {
-                    params.getInterfaceImplFilter().put(type, new ImplementClassFilter(impl));
-                }
-            }
-        } catch (Exception e) {
-            //ignore
-        }
     }
 
     @Override
