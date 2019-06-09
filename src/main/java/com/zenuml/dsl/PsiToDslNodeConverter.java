@@ -80,7 +80,13 @@ public class PsiToDslNodeConverter extends JavaElementVisitor {
         } else {
             PsiMethod psiMethod = callExpression.resolveMethod();
             findAbstractImplFilter(callExpression, psiMethod);
-            methodCall(psiMethod);
+            if (psiMethod != null) {
+                if (depth < 5) {
+                    depth++;
+                    generate(psiMethod);
+                    depth--;
+                }
+            }
             super.visitCallExpression(callExpression);
         }
     }
@@ -100,18 +106,6 @@ public class PsiToDslNodeConverter extends JavaElementVisitor {
             }
         } catch (Exception e) {
             //ignore
-        }
-    }
-
-    private void methodCall(PsiMethod psiMethod) {
-        if (psiMethod == null)
-            return;
-        if (params.getMethodFilter().allow(psiMethod)) {
-            if (depth < 5 - 1) {
-                depth++;
-                generate(psiMethod);
-                depth--;
-            }
         }
     }
 
