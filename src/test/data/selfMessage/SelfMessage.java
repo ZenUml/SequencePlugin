@@ -14,10 +14,10 @@ public class SelfMessage {
     }
 
     private void internalMethodA(int i) {
-        internalMethodB(100);
+        internalMethodB(100, 1000);
     }
 
-    private void internalMethodB(int i) {
+    private void internalMethodB(int i, int i1) {
 
     }
 }
