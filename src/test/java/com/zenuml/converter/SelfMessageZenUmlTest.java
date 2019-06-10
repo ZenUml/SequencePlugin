@@ -39,4 +39,16 @@ public class SelfMessageZenUmlTest extends ZenUmlTestCase {
         rootNode.toDsl();
         assertThat(rootNode.toDsl(), is("FirstClass.clientMethod{\n  SecondClass.method1;\n}"));
     }
+
+    public void test_convert_to_dsl_node_differentClass_multiple_calls() {
+        myFixture.copyDirectoryToProject("differentClass","");
+        PsiClass firstClass = myFixture.findClass("differentClass.FirstClass");
+        PsiMethod clientMethod = firstClass.findMethodsByName("clientMethod_multiple_calls", true)[0];
+
+        clientMethod.accept(psiToDslNodeConverter);
+
+        SequenceDiagram rootNode = psiToDslNodeConverter.rootNode();
+        rootNode.toDsl();
+        assertThat(rootNode.toDsl(), is("FirstClass.clientMethod_multiple_calls{\n  SecondClass.method1;\n  SecondClass.method1;\n}"));
+    }
 }
