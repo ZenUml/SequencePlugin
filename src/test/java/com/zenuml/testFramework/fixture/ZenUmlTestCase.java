@@ -11,4 +11,7 @@ public class ZenUmlTestCase extends LightCodeInsightFixtureTestCase {
         return Paths.get("src/test/data/").toAbsolutePath().toString();
     }
 
+    public void testEmptyTest() {
+
+    }
 }
