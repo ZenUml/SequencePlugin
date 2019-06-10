@@ -15,7 +15,7 @@ public class PsiToDslNodeConverter extends JavaElementVisitor {
         assert containingClass != null;
         String className = containingClass.getName();
         String methodName = psiMethod.getName();
-        FunctionNode functionNode = new FunctionNode(className, methodName, null);
+        FunctionNode functionNode = new FunctionNode(className, methodName + "()", null);
         sequenceDiagram.addSub(functionNode);
         psiMethod.acceptChildren(this);
     }

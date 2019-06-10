@@ -25,7 +25,7 @@ public class SelfMessageZenUmlTest extends ZenUmlTestCase {
         clientMethod.accept(psiToDslNodeConverter);
         SequenceDiagram rootNode = psiToDslNodeConverter.rootNode();
         rootNode.toDsl();
-        assertThat(rootNode.toDsl(), is("SelfMessage.clientMethod{\n  SelfMessage.internalMethod;\n}"));
+        assertThat(rootNode.toDsl(), is("SelfMessage.clientMethod(){\n  SelfMessage.internalMethod();\n}"));
     }
 
     public void test_convert_to_dsl_node_differentClass() {
@@ -37,7 +37,7 @@ public class SelfMessageZenUmlTest extends ZenUmlTestCase {
 
         SequenceDiagram rootNode = psiToDslNodeConverter.rootNode();
         rootNode.toDsl();
-        assertThat(rootNode.toDsl(), is("FirstClass.clientMethod{\n  SecondClass.method1;\n}"));
+        assertThat(rootNode.toDsl(), is("FirstClass.clientMethod(){\n  SecondClass.method1();\n}"));
     }
 
     public void test_convert_to_dsl_node_differentClass_multiple_calls() {
@@ -49,6 +49,6 @@ public class SelfMessageZenUmlTest extends ZenUmlTestCase {
 
         SequenceDiagram rootNode = psiToDslNodeConverter.rootNode();
         rootNode.toDsl();
-        assertThat(rootNode.toDsl(), is("FirstClass.clientMethod_multiple_calls{\n  SecondClass.method1;\n  SecondClass.method1;\n}"));
+        assertThat(rootNode.toDsl(), is("FirstClass.clientMethod_multiple_calls(){\n  SecondClass.method1();\n  SecondClass.method1();\n}"));
     }
 }
