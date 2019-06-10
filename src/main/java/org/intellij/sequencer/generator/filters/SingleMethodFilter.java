@@ -20,9 +20,7 @@ public class SingleMethodFilter implements MethodFilter {
 
     public boolean allow(PsiMethod psiMethod) {
         PsiClass containingClass = psiMethod.getContainingClass();
-        if(isSameClass(containingClass) && PsiUtil.isMethod(psiMethod, _methodName, _argTypes))
-            return false;
-        return true;
+        return !isSameClass(containingClass) || !PsiUtil.isMethod(psiMethod, _methodName, _argTypes);
     }
 
     private boolean isSameClass(PsiClass containingClass) {
