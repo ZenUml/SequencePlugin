@@ -16,7 +16,6 @@ public class SelfMessageZenUmlTest extends ZenUmlTestCase {
     public void setUp() throws Exception {
         super.setUp();
         psiToDslNodeConverter = new PsiToDslNodeConverter();
-
     }
 
     public void test_convert_to_dsl_node_selfMessage() {
@@ -36,6 +35,6 @@ public class SelfMessageZenUmlTest extends ZenUmlTestCase {
         clientMethod.accept(psiToDslNodeConverter);
         SequenceDiagram rootNode = psiToDslNodeConverter.rootNode();
         rootNode.toDsl();
-        assertThat(rootNode.toDsl(), is("SelfMessage.clientMethod2(){\n  SelfMessage.internalMethodA(10){\n    SelfMessage.internalMethodB(100, 1000);\n  }}"));
+        assertThat(rootNode.toDsl(), is("SelfMessage.clientMethod2(){\n  SelfMessage.internalMethodA(i){\n    SelfMessage.internalMethodB(100, 1000);\n  }}"));
     }
 }

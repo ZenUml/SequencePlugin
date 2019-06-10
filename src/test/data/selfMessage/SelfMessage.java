@@ -10,7 +10,8 @@ public class SelfMessage {
     }
 
     public void clientMethod2() {
-        internalMethodA(10);
+        int i = 10;
+        internalMethodA(i);
     }
 
     private void internalMethodA(int i) {
