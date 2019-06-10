@@ -1,7 +1,6 @@
 package org.intellij.sequencer;
 
 import com.intellij.ide.scratch.NewZenUmlBufferAction;
-import com.intellij.ide.scratch.ScratchFileActions;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext;
 import com.intellij.openapi.components.ProjectComponent;
@@ -25,6 +24,7 @@ import com.intellij.ui.components.JBTabbedPane;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.util.Query;
+import com.zenuml.dsl.SequenceGeneratorV1;
 import icons.SequencePluginIcons;
 import org.intellij.sequencer.generator.SequenceParams;
 import org.intellij.sequencer.generator.filters.MethodFilter;
@@ -100,26 +100,44 @@ public class SequencePlugin implements ProjectComponent {
         final SequencePanel sequencePanel = new SequencePanel(this, enclosingPsiMethod, params);
         Runnable postAction = new Runnable() {
             public void run() {
-                String dsl = sequencePanel.generate();
+                sequencePanel.generate();
                 addSequencePanel(sequencePanel);
 
-                NewZenUmlBufferAction newBufferAction = new NewZenUmlBufferAction();
-
-                HashMap<String, Object> map = new HashMap<>();
-                map.put(CommonDataKeys.PROJECT.getName(), event.getData(CommonDataKeys.PROJECT));
-                map.put(LangDataKeys.IDE_VIEW.getName(), event.getData(LangDataKeys.IDE_VIEW));
-                map.put(PlatformDataKeys.PREDEFINED_TEXT.getName(), dsl);
-                AnActionEvent anActionEvent = AnActionEvent.createFromAnAction(newBufferAction,
-                        null,
-                        event.getPlace(),
-                        SimpleDataContext.getSimpleContext(map, null));
-                newBufferAction.actionPerformed(anActionEvent);
             }
         };
         if(_toolWindow.isActive())
             _toolWindow.show(postAction);
         else
             _toolWindow.activate(postAction);
+    }
+
+    public void showZenUMLScratch(AnActionEvent event, SequenceParams params) {
+        PsiMethod enclosingPsiMethod = getCurrentPsiMethod();
+        if(enclosingPsiMethod == null)
+            return;
+
+        String dsl = generateZenUML(enclosingPsiMethod, params);
+        createZenUMLScratch(dsl, event);
+    }
+
+    private String generateZenUML(PsiMethod psiMethod, SequenceParams sequenceParams) {
+        SequenceGeneratorV1 sequenceGeneratorV1 = new SequenceGeneratorV1(sequenceParams);
+        sequenceGeneratorV1.generate(psiMethod);
+        return sequenceGeneratorV1.toDsl();
+    }
+
+    private void createZenUMLScratch(String dsl, AnActionEvent event) {
+        NewZenUmlBufferAction newBufferAction = new NewZenUmlBufferAction();
+
+        HashMap<String, Object> map = new HashMap<>();
+        map.put(CommonDataKeys.PROJECT.getName(), event.getData(CommonDataKeys.PROJECT));
+        map.put(LangDataKeys.IDE_VIEW.getName(), event.getData(LangDataKeys.IDE_VIEW));
+        map.put(PlatformDataKeys.PREDEFINED_TEXT.getName(), dsl);
+        AnActionEvent anActionEvent = AnActionEvent.createFromAnAction(newBufferAction,
+                null,
+                event.getPlace(),
+                SimpleDataContext.getSimpleContext(map, null));
+        newBufferAction.actionPerformed(anActionEvent);
     }
 
     private void addSequencePanel(final SequencePanel sequencePanel) {
