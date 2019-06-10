@@ -1,12 +1,9 @@
 package org.intellij.sequencer.diagram;
 
-import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
-import com.intellij.util.ui.UIUtil;
 import org.apache.log4j.Logger;
-import org.intellij.sequencer.config.Configuration;
+import org.intellij.sequencer.config.Configuration2;
 
-import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -229,7 +226,7 @@ public class DisplayObject extends ScreenObject {
             // todo make it configurable
             if(displayLink instanceof DisplaySelfCallReturn || displayLink.getLink().isBootstrap())
                 continue;
-            if(!Configuration.getInstance().SHOW_RETURN_ARROWS && displayLink instanceof DisplayCallReturn)
+            if(!Configuration2.getInstance().SHOW_RETURN_ARROWS && displayLink instanceof DisplayCallReturn)
                 continue;
             if(displayLink.getTo().getObjectInfo().getName().equals(ObjectInfo.ACTOR_NAME))
                 continue;
@@ -248,7 +245,7 @@ public class DisplayObject extends ScreenObject {
     public void paintHeader(Graphics2D g2) {
         if(!isInClipArea(g2, getPreferredHeaderHeight()))
             return;
-        Configuration configuration = Configuration.getInstance();
+        Configuration2 configuration = Configuration2.getInstance();
         if(configuration.USE_3D_VIEW) {
             g2.setPaint(SHADOW_COLOR);
             g2.fillRect(_x + 2, _y + 2, _textBox.getWidth(), _textBox.getHeight());
@@ -274,7 +271,7 @@ public class DisplayObject extends ScreenObject {
     }
 
     public int getPreferredHeaderHeight() {
-        int yDelta = Configuration.getInstance().USE_3D_VIEW? 2: 0;
+        int yDelta = Configuration2.getInstance().USE_3D_VIEW? 2: 0;
         return _y + _textBox.getHeight() + yDelta;
     }
 

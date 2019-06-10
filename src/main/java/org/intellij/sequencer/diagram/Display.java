@@ -3,7 +3,7 @@ package org.intellij.sequencer.diagram;
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.UIUtil;
 import org.intellij.sequencer.config.ConfigListener;
-import org.intellij.sequencer.config.Configuration;
+import org.intellij.sequencer.config.Configuration2;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -80,7 +80,7 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
     }
 
     private void setupGraphics(Graphics2D g2) {
-        Configuration configuration = Configuration.getInstance();
+        Configuration2 configuration = Configuration2.getInstance();
         g2.setFont(new Font(configuration.FONT_NAME, Font.PLAIN, configuration.FONT_SIZE));
         if (configuration.USE_ANTIALIASING) {
             HashMap hintsMap = new HashMap();
@@ -137,12 +137,12 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
 
     public void addNotify() {
         super.addNotify();
-        Configuration.getInstance().addConfigListener(this);
+        Configuration2.getInstance().addConfigListener(this);
         setScrollPaneHeaderView(getHeader());
     }
 
     public void removeNotify() {
-        Configuration.getInstance().removeConfigListener(this);
+        Configuration2.getInstance().removeConfigListener(this);
         setScrollPaneHeaderView(null);
         super.removeNotify();
     }

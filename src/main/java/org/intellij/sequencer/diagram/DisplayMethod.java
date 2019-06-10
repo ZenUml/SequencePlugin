@@ -2,7 +2,7 @@ package org.intellij.sequencer.diagram;
 
 import com.intellij.ui.JBColor;
 import org.apache.log4j.Logger;
-import org.intellij.sequencer.config.Configuration;
+import org.intellij.sequencer.config.Configuration2;
 
 import java.awt.*;
 
@@ -54,7 +54,7 @@ public class DisplayMethod extends ScreenObject {
     }
 
     public void paint(Graphics2D g2) {
-        Configuration configuration = Configuration.getInstance();
+        Configuration2 configuration = Configuration2.getInstance();
         if(configuration.USE_3D_VIEW) {
             g2.setPaint(SHADOW_COLOR);
             g2.fillRect(getX() + 2, getY() + 2, getWidth(), getHeight());

@@ -42,8 +42,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class SequencePlugin implements ProjectComponent {
-    private static final String PLAGIN_NAME = "Sequence";
+public class SequencePlugin2 implements ProjectComponent {
+    private static final String PLAGIN_NAME = "Sequence2";
     private static final Icon DISABLED_ICON = SequencePluginIcons.LOCKED_ICON;
     private static final Icon S_ICON = SequencePluginIcons.SEQUENCE_ICON_13;
 
@@ -52,10 +52,10 @@ public class SequencePlugin implements ProjectComponent {
     private JTabbedPane _jTabbedPane;
 
     public static Icon loadIcon(String name) {
-        return IconLoader.findIcon(SequencePlugin.class.getResource("/icons/" + name),true);
+        return IconLoader.findIcon(SequencePlugin2.class.getResource("/icons/" + name),true);
     }
 
-    public SequencePlugin(Project project) {
+    public SequencePlugin2(Project project) {
         _project = project;
     }
 
@@ -73,8 +73,8 @@ public class SequencePlugin implements ProjectComponent {
         return ToolWindowManager.getInstance(_project);
     }
 
-    public static SequencePlugin getInstance(Project project) {
-        return (SequencePlugin)project.getComponent(SequencePlugin.class);
+    public static SequencePlugin2 getInstance(Project project) {
+        return (SequencePlugin2)project.getComponent(SequencePlugin2.class);
     }
 
     public void projectClosed() {
@@ -293,7 +293,7 @@ public class SequencePlugin implements ProjectComponent {
                 int index = _jTabbedPane.indexAtLocation(e.getX(), e.getY());
                 if(index == -1)
                     return;
-                DefaultActionGroup popupGroup = new DefaultActionGroup("SequencePlugin.TabPopup", true);
+                DefaultActionGroup popupGroup = new DefaultActionGroup("SequencePlugin2.TabPopup", true);
                 if(isLockedTab(index))
                     popupGroup.add(new LockUnlockAction(index, false));
                 else

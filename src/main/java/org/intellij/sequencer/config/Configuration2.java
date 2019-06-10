@@ -15,8 +15,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-@State(name = "sequencePlugin", storages = {@Storage(file = "sequencePlugin.xml")})
-public class Configuration implements PersistentStateComponent<Configuration> {
+@State(name = "sequencePlugin2", storages = {@Storage(file = "sequencePlugin.xml")})
+public class Configuration2 implements PersistentStateComponent<Configuration2> {
     @OptionTag(converter = ColorConverter.class)
     public Color CLASS_COLOR = new Color(0xFFFFC0);
     @OptionTag(converter = ColorConverter.class)
@@ -39,10 +39,10 @@ public class Configuration implements PersistentStateComponent<Configuration> {
     private java.util.List _listeners = new ArrayList();
     private java.util.List<ExcludeEntry> _excludeList = new Vector<ExcludeEntry>();
 
-    public Configuration() {}
+    public Configuration2() {}
 
-    public static Configuration getInstance() {
-        return ServiceManager.getService(Configuration.class);
+    public static Configuration2 getInstance() {
+        return ServiceManager.getService(Configuration2.class);
     }
 
     public void addConfigListener(ConfigListener listener) {
@@ -70,12 +70,12 @@ public class Configuration implements PersistentStateComponent<Configuration> {
 
     @Nullable
     @Override
-    public Configuration getState() {
+    public Configuration2 getState() {
         return this;
     }
 
     @Override
-    public void loadState(Configuration configuration) {
+    public void loadState(Configuration2 configuration) {
         XmlSerializerUtil.copyBean(configuration, this);
     }
 

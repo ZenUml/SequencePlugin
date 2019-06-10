@@ -30,12 +30,12 @@ public class ShowZenUMLScratchAction extends AnAction {
         super.update(event);
 
         Presentation presentation = event.getPresentation();
-        SequencePlugin plugin = getPlugin(event);
+        SequencePlugin2 plugin = getPlugin(event);
         presentation.setEnabled(plugin != null && plugin.isInsideAMethod());
     }
 
     public void actionPerformed(AnActionEvent event) {
-        SequencePlugin plugin = getPlugin(event);
+        SequencePlugin2 plugin = getPlugin(event);
         OptionsDialogWrapper dialogWrapper = new OptionsDialogWrapper(getProject(event));
         dialogWrapper.show();
         if(dialogWrapper.isOK()) {
@@ -57,15 +57,15 @@ public class ShowZenUMLScratchAction extends AnAction {
         }
     }
 
-    private SequencePlugin getPlugin(AnActionEvent event) {
+    private SequencePlugin2 getPlugin(AnActionEvent event) {
         Project project = getProject(event);
         if(project == null)
             return null;
         return getPlugin(project);
     }
 
-    private SequencePlugin getPlugin(Project project) {
-        return SequencePlugin.getInstance(project);
+    private SequencePlugin2 getPlugin(Project project) {
+        return SequencePlugin2.getInstance(project);
     }
 
     private Project getProject(AnActionEvent event) {

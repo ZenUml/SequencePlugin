@@ -10,10 +10,10 @@ import javax.swing.*;
 public class ConfigurationOptions implements SearchableConfigurable {
 
     private ConfigurationUI _configurationUI;
-    private Configuration configuration;
+    private Configuration2 configuration;
 
 
-    public ConfigurationOptions(@NotNull Configuration configuration) {
+    public ConfigurationOptions(@NotNull Configuration2 configuration) {
         this.configuration = configuration;
     }
 
@@ -61,7 +61,7 @@ public class ConfigurationOptions implements SearchableConfigurable {
     @NotNull
     @Override
     public String getId() {
-        return "Settings.Sequence.Configuration";
+        return "Settings.Sequence.Configuration2";
     }
 
     @Nullable

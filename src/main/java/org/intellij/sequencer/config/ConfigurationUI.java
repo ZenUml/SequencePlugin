@@ -65,7 +65,7 @@ public class ConfigurationUI implements ActionListener {
         return _mainPanel;
     }
 
-    public boolean isModified(Configuration configuration) {
+    public boolean isModified(Configuration2 configuration) {
         if(!_classColor.getBackground().equals(configuration.CLASS_COLOR))
             return true;
         if(!_externalClassColor.getBackground().equals(configuration.EXTERNAL_CLASS_COLOR))
@@ -95,7 +95,7 @@ public class ConfigurationUI implements ActionListener {
         return false;
     }
 
-    public void apply(Configuration configuration) {
+    public void apply(Configuration2 configuration) {
         configuration.CLASS_COLOR = _classColor.getBackground();
         configuration.EXTERNAL_CLASS_COLOR = _externalClassColor.getBackground();
         configuration.METHOD_BAR_COLOR = _methodBarColor.getBackground();
@@ -111,7 +111,7 @@ public class ConfigurationUI implements ActionListener {
         configuration.setExcludeList(_excludeTableModel.getExcludeList());
     }
 
-    public void reset(Configuration configuration) {
+    public void reset(Configuration2 configuration) {
         _classColor.setBackground(configuration.CLASS_COLOR);
         _externalClassColor.setBackground(configuration.EXTERNAL_CLASS_COLOR);
         _methodBarColor.setBackground(configuration.METHOD_BAR_COLOR);
