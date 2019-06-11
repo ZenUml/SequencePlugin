@@ -19,6 +19,10 @@ public class SelfMessage {
     }
 
     private void internalMethodB(int i, int i1) {
+        internalMethodC(i1, i);
+    }
+
+    private void internalMethodC(int i, int i1) {
 
     }
 }

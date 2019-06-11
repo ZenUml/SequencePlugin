@@ -35,6 +35,6 @@ public class SelfMessageZenUmlTest extends ZenUmlTestCase {
         clientMethod.accept(psiToDslNodeConverter);
         SequenceDiagram rootNode = psiToDslNodeConverter.rootNode();
         rootNode.toDsl();
-        assertThat(rootNode.toDsl(), is("SelfMessage.clientMethod2(){\n  SelfMessage.internalMethodA(i){\n    SelfMessage.internalMethodB(100, 1000);\n  }}"));
+        assertThat(rootNode.toDsl(), is("SelfMessage.clientMethod2(){\n  SelfMessage.internalMethodA(i){\n    SelfMessage.internalMethodB(100, 1000){\n      SelfMessage.internalMethodC(i1, i);\n    }  }}"));
     }
 }
