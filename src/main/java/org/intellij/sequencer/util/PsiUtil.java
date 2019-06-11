@@ -144,6 +144,7 @@ public class PsiUtil {
         return false;
     }
 
+    // Arguments contain callExpression
     public static boolean isComplexCall(PsiCallExpression callExpression) {
         PsiExpressionList argumentList = callExpression.getArgumentList();
         if (argumentList != null) {
