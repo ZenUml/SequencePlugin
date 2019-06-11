@@ -1,7 +1,6 @@
 package com.zenuml.converter;
 
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiMethod;
+import com.intellij.psi.*;
 import com.zenuml.dsl.PsiToDslNodeConverter;
 import com.zenuml.dsl.SequenceDiagram;
 import com.zenuml.testFramework.fixture.ZenUmlTestCase;

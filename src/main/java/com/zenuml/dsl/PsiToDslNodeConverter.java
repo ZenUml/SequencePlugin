@@ -1,65 +1,37 @@
 package com.zenuml.dsl;
 
-import com.intellij.navigation.NavigationItem;
-import com.intellij.psi.*;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.psi.JavaRecursiveElementWalkingVisitor;
+import com.intellij.psi.PsiIfStatement;
+import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiMethodCallExpression;
 
-import java.util.AbstractMap;
-import java.util.Optional;
+import java.util.Arrays;
 
-public class PsiToDslNodeConverter extends JavaElementVisitor {
+public class PsiToDslNodeConverter extends JavaRecursiveElementWalkingVisitor {
 
     private SequenceDiagram sequenceDiagram = new SequenceDiagram();
 
-    public void visitElement(PsiElement psiElement) {
-        psiElement.acceptChildren(this);
-    }
-
-    public void visitMethod(PsiMethod psiMethod) {
-        System.out.println("Enter: visitMethod");
-        String methodExpression = psiMethod.getName() + "()";
-        PsiClass containingClass = psiMethod.getContainingClass();
-        Optional<FunctionNode> functionNode = Optional
-                .ofNullable(containingClass)
-                .map(NavigationItem::getName)
-                .map(className -> new FunctionNode(className, methodExpression, null));
-        functionNode.ifPresent(n -> sequenceDiagram.addSub(n));
-        psiMethod.acceptChildren(this);
+    @Override
+    public void visitMethod(PsiMethod method) {
+        System.out.println("Enter: visitMethod:" + method);
+        super.visitMethod(method);
         System.out.println("Exit: visitMethod");
     }
 
     @Override
-    public void visitCallExpression(PsiCallExpression callExpression) {
-        System.out.println("Enter: visitCallExpression");
-
-        Optional<PsiCallExpression> callExpressionOptional = Optional.ofNullable(callExpression);
-
-        Optional<PsiCallExpression> methodCallExpression = callExpressionOptional
-                .filter(c -> Optional.ofNullable(callExpression.resolveMethod()).isPresent());
-
-        methodCallExpression
-                .map(c -> new AbstractMap.SimpleImmutableEntry<>(c.getText(), c.resolveMethod().getContainingClass().getName()))
-                .flatMap(cm -> {
-                    String text = cm.getKey();
-                    String methodExpression = removeCallee(text);
-                    return Optional.of(new FunctionNode(cm.getValue(), methodExpression, null));
-                })
-                .ifPresent(n -> sequenceDiagram.addSub(n));
-
-        methodCallExpression
-                .map(PsiCall::resolveMethod)
-                .ifPresent(m -> {
-                    m.acceptChildren(this);
-                    sequenceDiagram.end();
-                });
-
-        System.out.println("Exit: visitCallExpression");
+    public void visitMethodCallExpression(PsiMethodCallExpression expression) {
+        System.out.println("Enter: visitMethodCallExpression:" + expression);
+        super.visitMethodCallExpression(expression);
+        System.out.println("Exit: visitMethodCallExpression");
     }
 
-    @NotNull
-    private String removeCallee(String expression) {
-        int lastDotPos = expression.lastIndexOf(".");
-        return expression.substring(lastDotPos + 1);
+    @Override
+    public void visitIfStatement(PsiIfStatement statement) {
+        System.out.println("Enter: visitIfStatement:" + statement);
+        Arrays.stream(statement.getChildren())
+                .forEach(c -> System.out.println(c.getClass() + ":" + c.getText()));
+        super.visitIfStatement(statement);
+        System.out.println("Exit: visitIfStatement:" + statement);
     }
 
     public SequenceDiagram rootNode() {
