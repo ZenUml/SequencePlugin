@@ -4,6 +4,7 @@ import com.intellij.navigation.NavigationItem;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.AbstractMap;
 import java.util.Optional;
 
 public class PsiToDslNodeConverter extends JavaElementVisitor {
@@ -37,11 +38,11 @@ public class PsiToDslNodeConverter extends JavaElementVisitor {
                 .filter(c -> Optional.ofNullable(callExpression.resolveMethod()).isPresent());
 
         methodCallExpression
-                .flatMap(callExpression1 -> {
-                    PsiMethod psiMethod = callExpression1.resolveMethod();
-                    String text = callExpression1.getText();
+                .map(c -> new AbstractMap.SimpleImmutableEntry<>(c.getText(), c.resolveMethod().getContainingClass().getName()))
+                .flatMap(cm -> {
+                    String text = cm.getKey();
                     String methodExpression = removeCallee(text);
-                    return Optional.of(new FunctionNode(psiMethod.getContainingClass().getName(), methodExpression, null));
+                    return Optional.of(new FunctionNode(cm.getValue(), methodExpression, null));
                 })
                 .ifPresent(n -> sequenceDiagram.addSub(n));
 
