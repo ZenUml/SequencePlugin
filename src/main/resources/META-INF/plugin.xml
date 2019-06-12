@@ -21,7 +21,7 @@ The original version SequencePlugin come from ksibilev@yahoo.com.</p>
 ]]></description>
     <version>1.2.4</version>
     <vendor>fanhuagang@gmail.com</vendor>
-    <idea-version since-build="141.1"/>
+    <idea-version since-build="182.1"/>
 
     <depends>com.intellij.modules.java</depends>
 

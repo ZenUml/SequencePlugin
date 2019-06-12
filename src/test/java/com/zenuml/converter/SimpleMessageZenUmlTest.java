@@ -17,10 +17,19 @@ public class SimpleMessageZenUmlTest extends ZenUmlTestCase {
         psiToDslConverter = new PsiToDslConverter();
     }
 
-    public void test_convert_to_dsl_node_selfMessage() {
+    public void test_convert_to_dsl_simpleMessage() {
         myFixture.copyDirectoryToProject("simpleMessage","");
         PsiClass selfMessageClass = myFixture.findClass("simpleMessage.SimpleMessage");
         PsiMethod clientMethod = selfMessageClass.findMethodsByName("clientMethod", true)[0];
+        clientMethod.accept(psiToDslConverter);
+        String dsl = psiToDslConverter.getDsl();
+        assertThat(dsl, is("SimpleMessage.clientMethod()"));
+    }
+
+    public void test_convert_to_dsl_nestedMessage() {
+        myFixture.copyDirectoryToProject("simpleMessage","");
+        PsiClass selfMessageClass = myFixture.findClass("simpleMessage.SimpleMessage");
+        PsiMethod clientMethod = selfMessageClass.findMethodsByName("nestedMethod", true)[0];
         clientMethod.accept(psiToDslConverter);
         String dsl = psiToDslConverter.getDsl();
         assertThat(dsl, is("SimpleMessage.clientMethod()"));
