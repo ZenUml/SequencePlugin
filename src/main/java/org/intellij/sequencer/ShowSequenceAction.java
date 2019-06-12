@@ -53,7 +53,7 @@ public class ShowSequenceAction extends AnAction {
             params.getMethodFilter().addFilter(new NoGetterSetterFilter(_noGetterSetters));
             params.getMethodFilter().addFilter(new NoPrivateMethodsFilter(_noPrivateMethods));
             params.getMethodFilter().addFilter(new NoConstructorsFilter(_noConstructors));
-            plugin.showSequence(params);
+            plugin.showSequence(event, params);
         }
     }
 

@@ -1,6 +1,8 @@
 package org.intellij.sequencer;
 
+import com.intellij.ide.scratch.ScratchFileActions;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.impl.SimpleDataContext;
 import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.Editor;
@@ -36,6 +38,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class SequencePlugin implements ProjectComponent {
@@ -87,7 +90,7 @@ public class SequencePlugin implements ProjectComponent {
     public void disposeComponent() {
     }
 
-    public void showSequence(SequenceParams params) {
+    public void showSequence(AnActionEvent event, SequenceParams params) {
         PsiMethod enclosingPsiMethod = getCurrentPsiMethod();
         if(enclosingPsiMethod == null)
             return;
@@ -96,8 +99,20 @@ public class SequencePlugin implements ProjectComponent {
         final SequencePanel sequencePanel = new SequencePanel(this, enclosingPsiMethod, params);
         Runnable postAction = new Runnable() {
             public void run() {
-                sequencePanel.generate();
+                String dsl = sequencePanel.generate();
                 addSequencePanel(sequencePanel);
+
+                ScratchFileActions.NewBufferAction newBufferAction = new ScratchFileActions.NewBufferAction();
+
+                HashMap<String, Object> map = new HashMap<>();
+                map.put(CommonDataKeys.PROJECT.getName(), event.getData(CommonDataKeys.PROJECT));
+                map.put(LangDataKeys.IDE_VIEW.getName(), event.getData(LangDataKeys.IDE_VIEW));
+                map.put(PlatformDataKeys.PREDEFINED_TEXT.getName(), dsl);
+                AnActionEvent anActionEvent = AnActionEvent.createFromAnAction(newBufferAction,
+                        null,
+                        event.getPlace(),
+                        SimpleDataContext.getSimpleContext(map, null));
+                newBufferAction.actionPerformed(anActionEvent);
             }
         };
         if(_toolWindow.isActive())
