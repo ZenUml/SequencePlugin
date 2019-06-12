@@ -1,8 +1,10 @@
 package com.zenuml.dsl;
 
-import com.intellij.psi.JavaRecursiveElementVisitor;
-import com.intellij.psi.PsiMethod;
-import com.intellij.psi.PsiMethodCallExpression;
+import com.intellij.psi.*;
+import com.intellij.psi.impl.source.tree.PsiWhiteSpaceImpl;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Arrays;
 
 public class PsiToDslConverter extends JavaRecursiveElementVisitor {
     private String dsl = "";
@@ -15,6 +17,8 @@ public class PsiToDslConverter extends JavaRecursiveElementVisitor {
             dsl += "{";
             super.visitMethod(method);
             dsl += "}";
+        } else {
+            dsl += ";";
         }
     }
 
@@ -25,6 +29,23 @@ public class PsiToDslConverter extends JavaRecursiveElementVisitor {
             visitMethod(method);
             super.visitMethodCallExpression(expression);
         }
+    }
+
+    @Override
+    public void visitIfStatement(PsiIfStatement statement) {
+        dsl += "if(condition)";
+        System.out.println("Enter: visitIfStatement:" + statement);
+        Arrays.stream(statement.getChildren())
+                .filter(c -> c.getClass() != PsiWhiteSpaceImpl.class)
+                .forEach(c -> System.out.println(c.getClass() + ":\n" + c.getText()));
+        super.visitIfStatement(statement);
+        System.out.println("Exit: visitIfStatement:" + statement);
+    }
+
+    public void visitBlockStatement(PsiBlockStatement statement) {
+        dsl += "{";
+        super.visitBlockStatement(statement);
+        dsl += "}";
     }
 
     public String getDsl() {

@@ -2,15 +2,9 @@ package selfMessage;
 
 public class SelfMessage {
     public void clientMethod() {
-        int i = 0;
-        if (i == 0)
-            internalMethod(10);
-        internalMethod(11);
-        else if (i == 1) {
-            internalMethod(9);
-        } else {
-            internalMethod(8);
-        }
+        internalMethodA(1);
+        internalMethodB(2);
+        internalMethodC(3);
     }
 
     private void internalMethod(int i) {

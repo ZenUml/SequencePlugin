@@ -2,7 +2,7 @@ package com.zenuml.converter;
 
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMethod;
-import com.zenuml.dsl.PsiToDslNodeConverter;
+import com.zenuml.dsl.PsiToDslConverter;
 import com.zenuml.dsl.SequenceDiagram;
 import com.zenuml.testFramework.fixture.ZenUmlTestCase;
 
@@ -11,11 +11,11 @@ import static org.junit.Assert.assertThat;
 
 public class DifferentClassesZenUmlTest extends ZenUmlTestCase {
 
-    private PsiToDslNodeConverter psiToDslNodeConverter;
+    private PsiToDslConverter psiToDslConverter;
 
     public void setUp() throws Exception {
         super.setUp();
-        psiToDslNodeConverter = new PsiToDslNodeConverter();
+        psiToDslConverter = new PsiToDslConverter();
 
     }
 
@@ -24,11 +24,10 @@ public class DifferentClassesZenUmlTest extends ZenUmlTestCase {
         PsiClass firstClass = myFixture.findClass("differentClass.FirstClass");
         PsiMethod clientMethod = firstClass.findMethodsByName("clientMethod", true)[0];
 
-        clientMethod.accept(psiToDslNodeConverter);
+        clientMethod.accept(psiToDslConverter);
 
-        SequenceDiagram rootNode = psiToDslNodeConverter.rootNode();
-        rootNode.toDsl();
-        assertThat(rootNode.toDsl(), is("FirstClass.clientMethod(){\n  SecondClass.method1();\n}"));
+
+        assertThat(psiToDslConverter.getDsl(), is("FirstClass.clientMethod(){SecondClass.method1();}"));
     }
 
     public void test_convert_to_dsl_node_differentClass_multiple_calls() {
@@ -36,10 +35,8 @@ public class DifferentClassesZenUmlTest extends ZenUmlTestCase {
         PsiClass firstClass = myFixture.findClass("differentClass.FirstClass");
         PsiMethod clientMethod = firstClass.findMethodsByName("clientMethod_multiple_calls", true)[0];
 
-        clientMethod.accept(psiToDslNodeConverter);
+        clientMethod.accept(psiToDslConverter);
 
-        SequenceDiagram rootNode = psiToDslNodeConverter.rootNode();
-        rootNode.toDsl();
-        assertThat(rootNode.toDsl(), is("FirstClass.clientMethod_multiple_calls(){\n  SecondClass.method1();\n  SecondClass.method1();\n}"));
+        assertThat(psiToDslConverter.getDsl(), is("FirstClass.clientMethod_multiple_calls(){SecondClass.method1();SecondClass.method1();}"));
     }
 }
