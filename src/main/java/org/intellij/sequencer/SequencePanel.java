@@ -6,6 +6,8 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.ui.components.JBScrollBar;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.UIUtil;
+import com.zenuml.dsl.PsiToDslConverter;
+import com.zenuml.dsl.SequenceGeneratorV1;
 import icons.SequencePluginIcons;
 import org.intellij.sequencer.diagram.*;
 import org.intellij.sequencer.generator.CallStack;
@@ -85,15 +87,21 @@ public class SequencePanel extends JPanel {
         _display.invalidate();
     }
 
-    public void generate() {
+    public String generate() {
         if (_psiMethod == null || !_psiMethod.isValid()) { // || !_psiMethod.isPhysical()
             _psiMethod = null;
-            return;
+            return null;
         }
         SequenceGenerator generator = new SequenceGenerator(_sequenceParams);
         final CallStack callStack = generator.generate(_psiMethod);
         _titleName = callStack.getMethod().getTitleName();
         generate(callStack.generateSequence());
+
+//        SequenceGeneratorV1 sequenceGeneratorV1=new SequenceGeneratorV1(_sequenceParams);
+//        sequenceGeneratorV1.generate(_psiMethod);
+        PsiToDslConverter psiToDslConverter = new PsiToDslConverter();
+        _psiMethod.accept(psiToDslConverter);
+        return psiToDslConverter.getDsl();
     }
 
     public void generateTextFile(File selectedFile) throws IOException {

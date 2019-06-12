@@ -1,4 +1,4 @@
-package org.intellij.sequencer.generator;
+package com.zenuml.dsl;
 
 import com.google.gson.GsonBuilder;
 import org.intellij.sequencer.Constants;
@@ -54,6 +54,10 @@ public class MethodDescription {
         return _methodName;
     }
 
+    public String getMethodSignature(){
+        return _methodName+"()";
+    }
+
     public String getTitleName() {
         return getClassDescription().getClassShortName() + '.' +
                 getMethodName() + "()";
@@ -104,21 +108,21 @@ public class MethodDescription {
         return _hashCode;
     }
 
-    public static MethodDescription createMethodDescription(ClassDescription classDescription,
+    static MethodDescription createMethodDescription(ClassDescription classDescription,
                                                      List attributes, String methodName,
                                                      String returnType,
                                                      List argNames, List argTypes) {
         return new MethodDescription(classDescription, attributes, methodName, returnType, argNames, argTypes);
     }
 
-    public static MethodDescription createConstructorDescription(ClassDescription classDescription,
+    static MethodDescription createConstructorDescription(ClassDescription classDescription,
                                                           List attributes, List argNames,
                                                           List argTypes) {
         return new MethodDescription(classDescription, attributes, Constants.CONSTRUCTOR_METHOD_NAME,
                 classDescription.getClassName(), argNames, argTypes);
     }
 
-    public static MethodDescription createLambdaDescription(ClassDescription classDescription,
+    static MethodDescription createLambdaDescription(ClassDescription classDescription,
                                                      List argNames, List argTypes, String returnType) {
         return new MethodDescription(classDescription,
                 new ArrayList(), Constants.Lambda_Invoke, returnType, argNames, argTypes);

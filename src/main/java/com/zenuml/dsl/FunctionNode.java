@@ -3,23 +3,23 @@ package com.zenuml.dsl;
 public class FunctionNode extends DslNode {
     private final String className;
     private final String functionName;
-    private final String result;
+    private final String assignee;
 
     public FunctionNode(String className, String functionName) {
         this(className,functionName,null);
     }
 
-    public FunctionNode(String className, String functionName, String result) {
+    public FunctionNode(String className, String functionName, String assignee) {
         super();
         this.className=className;
         this.functionName=functionName;
-        this.result=result;
+        this.assignee = assignee;
     }
 
     @Override
     public void toDsl(StringBuffer output) {
         printIndent(output);
-        printResult(output);
+        printAssignment(output);
         printFunctionCall(output);
         if (!hasChildren() && !isRoot()) {
             output.append(";\n");
@@ -27,7 +27,7 @@ public class FunctionNode extends DslNode {
             output.append("{\n");
             printChindren(output);
             printIndent(output);
-            output.append("}");
+            output.append("}\n");
         }
     }
 
@@ -37,9 +37,9 @@ public class FunctionNode extends DslNode {
         output.append(functionName);
     }
 
-    private void printResult(StringBuffer output) {
-        if(result!=null){
-            output.append(result);
+    private void printAssignment(StringBuffer output) {
+        if(assignee !=null){
+            output.append(assignee);
             output.append("=");
         }
     }

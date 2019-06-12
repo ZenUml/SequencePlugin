@@ -10,7 +10,7 @@ public class ConstructorNode extends DslNode {
     }
 
     @Override
-    void toDsl(StringBuffer output) {
+    public void toDsl(StringBuffer output) {
         printIndent(output);
         if (hasChildren()) {
             output.append(String.format("%s = new %s{\n", var, constructor));
