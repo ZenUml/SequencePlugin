@@ -1,37 +1,48 @@
 package com.zenuml.dsl;
 
-import com.intellij.psi.JavaRecursiveElementWalkingVisitor;
-import com.intellij.psi.PsiIfStatement;
-import com.intellij.psi.PsiMethod;
-import com.intellij.psi.PsiMethodCallExpression;
+import com.intellij.psi.*;
+import com.intellij.psi.impl.source.tree.PsiWhiteSpaceImpl;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 
-public class PsiToDslNodeConverter extends JavaRecursiveElementWalkingVisitor {
+public class PsiToDslNodeConverter extends JavaRecursiveElementVisitor {
 
     private SequenceDiagram sequenceDiagram = new SequenceDiagram();
+    private int depth = 0;
 
     @Override
     public void visitMethod(PsiMethod method) {
-        System.out.println("Enter: visitMethod:" + method);
+        depth += 2;
+        String indent = StringUtils.repeat(" ", depth);
+        System.out.println(indent + "Enter: visitMethod:" + method);
         super.visitMethod(method);
-        System.out.println("Exit: visitMethod");
+        System.out.println(indent + "Exit: visitMethod");
+        depth -= 2;
     }
 
     @Override
     public void visitMethodCallExpression(PsiMethodCallExpression expression) {
-        System.out.println("Enter: visitMethodCallExpression:" + expression);
+        depth += 2;
+        String indent = StringUtils.repeat(" ", depth);
+
+        System.out.println(indent + "Enter: visitMethodCallExpression:" + expression);
         super.visitMethodCallExpression(expression);
-        System.out.println("Exit: visitMethodCallExpression");
+        System.out.println(indent + "Exit: visitMethodCallExpression");
+        depth -= 2;
     }
 
     @Override
     public void visitIfStatement(PsiIfStatement statement) {
-        System.out.println("Enter: visitIfStatement:" + statement);
+        depth += 2;
+        String indent = StringUtils.repeat(" ", depth);
+        System.out.println(indent + "Enter: visitIfStatement:" + statement);
         Arrays.stream(statement.getChildren())
-                .forEach(c -> System.out.println(c.getClass() + ":" + c.getText()));
+                .filter(c -> c.getClass() != PsiWhiteSpaceImpl.class)
+                .forEach(c -> System.out.println(indent + c.getClass() + ":\n" + indent + c.getText()));
         super.visitIfStatement(statement);
-        System.out.println("Exit: visitIfStatement:" + statement);
+        System.out.println(indent + "Exit: visitIfStatement:" + statement);
+        depth -= 2;
     }
 
     public SequenceDiagram rootNode() {
